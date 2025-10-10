@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pyxel Web Console (Local)</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            height: 100%;
+        }
+
+        #root {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #000;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script>
+        (function () {
+            function loadScript(src) {
+                return new Promise((resolve, reject) => {
+                    const s = document.createElement('script');
+                    s.src = src;
+                    s.async = true;
+                    s.crossOrigin = 'anonymous';
+                    s.onload = () => resolve();
+                    s.onerror = () => reject(new Error('failed to load ' + src));
+                    document.head.appendChild(s);
+                });
+            }
+
+            function getParam(name, defaultValue) {
+                const params = new URLSearchParams(location.search);
+                return params.get(name) || defaultValue;
+            }
+            const app = getParam('app', '/game.pyxapp');
+            const name = app.replace(/^\//, '');
+
+            const sources = [
+                '/pyxel/pyxel.js',
+                'https://kitao.github.io/pyxel/wasm/pyxel.js'
+            ];
+
+            (async () => {
+                let loaded = false;
+                for (const src of sources) {
+                    try {
+                        await loadScript(src);
+                        loaded = true;
+                        break;
+                    } catch (e) {
+                        console.warn(String(e));
+                    }
+                }
+
+                if (loaded && window.launchPyxel) {
+                    const root = window.location.origin;
+                    launchPyxel({ command: 'play', root, name, packages: '', gamepad: 'enabled' });
+                } else if (loaded && window.pyxel && typeof window.pyxel.run === 'function') {
+                    // legacy fallback API
+                    window.pyxel.run(name);
+                } else {
+                    const el = document.createElement('div');
+                    el.style.color = '#fff';
+                    el.style.font = '14px monospace';
+                    el.style.padding = '16px';
+                    el.textContent = 'Failed to load pyxel.js';
+                    document.getElementById('root').appendChild(el);
+                }
+            })();
+        })();
+    </script>
+</body>
+
+</html>
