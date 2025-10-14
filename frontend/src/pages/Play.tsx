@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 import { useMemo, useState, useEffect } from 'react'
 import { streamUrlForModel } from '../config'
 import MjpegViewer from '../components/MjpegViewer'
-import { submitScore } from '../api/scores'
+import { submitScore, submitGamePlayData } from '../api/scores'
 
 // 게임 데이터 타입 정의
 interface GameData {
@@ -117,28 +117,32 @@ export default function Play() {
         setSubmitMessage('')
 
         try {
-            // 점수와 통계 정보를 백엔드로 전송
-            const res = await submitScore({
+            // 1. 점수 정보를 백엔드로 전송
+            const scoreRes = await submitScore({
                 nickname: nickname.trim(),
                 score: gameData.score,
                 modelId,
             })
 
-            if ('ok' in res && res.ok) {
-                setSubmitMessage('✅ 점수가 등록되었습니다!')
+            if (!('ok' in scoreRes && scoreRes.ok)) {
+                setSubmitMessage('❌ 점수 등록에 실패했습니다. 다시 시도해주세요.')
+                setSubmitting(false)
+                return
+            }
 
-                // 게임 플레이 데이터를 JSON 파일로 다운로드
-                const dataStr = JSON.stringify(gameData, null, 2)
-                const dataBlob = new Blob([dataStr], { type: 'application/json' })
-                const url = URL.createObjectURL(dataBlob)
-                const link = document.createElement('a')
-                link.href = url
-                link.download = `gameplay_${nickname}_${gameData.score}_${new Date().getTime()}.json`
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
-                URL.revokeObjectURL(url)
+            // 2. 게임 플레이 데이터를 백엔드로 전송
+            const gamePlayRes = await submitGamePlayData({
+                nickname: nickname.trim(),
+                score: gameData.score,
+                final_stage: gameData.final_stage,
+                model_id: modelId,
+                statistics: gameData.statistics,
+                frames: gameData.frames,
+            })
 
+            if ('ok' in gamePlayRes && gamePlayRes.ok) {
+                setSubmitMessage('✅ 점수와 게임 데이터가 등록되었습니다!')
+                
                 // 3초 후 UI 초기화
                 setTimeout(() => {
                     setShowSubmit(false)
@@ -147,7 +151,7 @@ export default function Play() {
                     setSubmitMessage('')
                 }, 3000)
             } else {
-                setSubmitMessage('❌ 점수 등록에 실패했습니다. 다시 시도해주세요.')
+                setSubmitMessage('⚠️ 점수는 등록되었으나 게임 데이터 전송에 실패했습니다.')
             }
         } catch (error) {
             console.error('Submit error:', error)
@@ -272,7 +276,7 @@ export default function Play() {
                             boxShadow: submitting || !nickname.trim() ? 'none' : '0 2px 10px rgba(107, 115, 255, 0.4)'
                         }}
                     >
-                        {submitting ? '등록 중...' : '점수 등록 및 플레이 데이터 다운로드'}
+                        {submitting ? '등록 중...' : '점수 등록'}
                     </button>
 
                     {submitMessage && (
@@ -289,7 +293,7 @@ export default function Play() {
                     )}
 
                     <div style={{ fontSize: 13, color: '#b0b0c0', marginTop: 8 }}>
-                        💡 등록하면 게임 플레이 데이터가 JSON 파일로 자동 다운로드됩니다.
+                        💡 등록하면 점수와 게임 플레이 데이터가 데이터베이스에 저장됩니다.
                     </div>
                 </div>
             )}
