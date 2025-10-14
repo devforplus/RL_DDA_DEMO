@@ -65,6 +65,7 @@ class GameStateStage:
         )
 
         self.hud = Hud(game.game_vars, self.font)
+        self.hud.player = self.player  # HUD에 플레이어 참조 전달
 
         self.check_stage_clear = False
 
@@ -91,6 +92,7 @@ class GameStateStage:
 
     def respawn_player(self):
         self.player = Player(self)
+        self.hud.player = self.player  # HUD에 새 플레이어 참조 전달
 
     def get_scroll_x_speed(self):
         return self.background.scroll_x_speed
