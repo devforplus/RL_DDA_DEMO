@@ -1,19 +1,28 @@
-
 from enum import Enum, auto
 
 import pyxel as px
 
-from const import FINAL_STAGE, STAGE_MUSIC_FILES, MUSIC_GAME_OVER, MUSIC_BOSS,\
-    MUSIC_STAGE_CLEAR
+from const import (
+    FINAL_STAGE,
+    STAGE_MUSIC_FILES,
+    MUSIC_GAME_OVER,
+    MUSIC_BOSS,
+    MUSIC_STAGE_CLEAR,
+)
 from player import Player
-from sprite import sprites_update, sprites_draw, sprite_lists_collide, \
-    sprite_collide_list
+from sprite import (
+    sprites_update,
+    sprites_draw,
+    sprite_lists_collide,
+    sprite_collide_list,
+)
 from hud import Hud
 from explosion import Explosion
 from powerup import Powerup
 from stage_background import StageBackground
 import input
 from audio import load_music, play_music, is_music_playing, stop_music
+
 
 class State(Enum):
     PLAYER_SPAWNED = 0
@@ -23,8 +32,10 @@ class State(Enum):
     GAME_OVER = auto()
     STAGE_CLEAR = auto()
 
+
 PLAYER_SPAWN_IN_FRAMES = 30
 STAGE_CLEAR_FRAMES = 180
+
 
 class GameStateStage:
     def __init__(self, game) -> None:
@@ -48,16 +59,16 @@ class GameStateStage:
         Powerup.reset_cycle()
 
         self.background = StageBackground(
-            self, 
+            self,
             f"stage_{game.game_vars.stage_num}.tmx",
-            self.game.game_vars.is_vortex_stage())
+            self.game.game_vars.is_vortex_stage(),
+        )
 
         self.hud = Hud(game.game_vars, self.font)
 
         self.check_stage_clear = False
 
-        self.music = load_music(
-            STAGE_MUSIC_FILES[self.game.game_vars.stage_num])
+        self.music = load_music(STAGE_MUSIC_FILES[self.game.game_vars.stage_num])
         play_music(self.music, num_channels=3)
 
     def on_exit(self):
@@ -86,7 +97,7 @@ class GameStateStage:
 
     def add_enemy(self, e):
         self.enemies.append(e)
-        #print(f"Added enemy type {e.type} at {e.x//8},{e.y//8}")
+        # print(f"Added enemy type {e.type} at {e.x//8},{e.y//8}")
 
     def add_boss(self, b):
         self.bosses.append(b)
@@ -110,7 +121,7 @@ class GameStateStage:
     # Doesnt include bosses.
     def get_num_enemies(self):
         return len(self.enemies)
-    
+
     def add_player_shot(self, s):
         self.player_shots.append(s)
 
@@ -119,19 +130,50 @@ class GameStateStage:
 
     def update_play(self):
         self.player.update()
+        self._record_frame_data()
+
+    def _record_frame_data(self):
+        """현재 프레임의 게임 데이터를 기록"""
+        try:
+            frame_data = {
+                "frame_number": self.game.data_collector.total_frames,
+                "player_x": float(self.player.x),
+                "player_y": float(self.player.y),
+                "player_lives": self.game.game_vars.lives,
+                "player_score": self.game.game_vars.score,
+                "current_weapon": self.game.game_vars.current_weapon,
+                "input_left": 1 if self.input.is_pressing(input.LEFT) else 0,
+                "input_right": 1 if self.input.is_pressing(input.RIGHT) else 0,
+                "input_up": 1 if self.input.is_pressing(input.UP) else 0,
+                "input_down": 1 if self.input.is_pressing(input.DOWN) else 0,
+                "input_button1": 1 if self.input.is_pressing(input.BUTTON_1) else 0,
+                "input_button2": 1 if self.input.is_pressing(input.BUTTON_2) else 0,
+                "stage_num": self.game.game_vars.stage_num,
+                "timestamp": float(self.state_time) / 30.0,  # 30 FPS 기준
+            }
+            self.game.data_collector.record_frame(frame_data)
+        except Exception as e:
+            # 데이터 수집 실패해도 게임은 계속 진행
+            pass
 
     def switch_state(self, new):
         self.state = new
         self.state_time = 0
-        #print(f"Switched stage state to {self.state}")
+        # print(f"Switched stage state to {self.state}")
 
     def update_player_dead(self):
         if len(self.explosions) == 0:
             if self.game.game_vars.lives > 0:
                 self.respawn_player()
                 self.switch_state(State.PLAYER_SPAWNED)
+                self.game.data_collector.add_death()
             else:
                 self.switch_state(State.GAME_OVER)
+                self.game.data_collector.add_death()
+                # 게임 오버 시 데이터 수집 종료
+                import time
+
+                self.game.data_collector.stop_recording(time.time())
                 self.music = load_music(MUSIC_GAME_OVER)
                 play_music(self.music, False, num_channels=3)
 
@@ -140,10 +182,46 @@ class GameStateStage:
         play_music(self.music, True, num_channels=3)
 
     def update_game_over(self):
-        if self.input.has_tapped(input.BUTTON_1) or \
-            self.input.has_tapped(input.BUTTON_2) or \
-            not is_music_playing():
+        if (
+            self.input.has_tapped(input.BUTTON_1)
+            or self.input.has_tapped(input.BUTTON_2)
+            or not is_music_playing()
+        ):
+            # 게임 오버 화면에서 데이터를 JavaScript로 전달
+            self._export_game_over_data()
             self.game.go_to_titles()
+
+    def _export_game_over_data(self):
+        """게임 오버 시 게임 데이터를 JavaScript로 전달"""
+        try:
+            import json
+
+            game_data = self.game.data_collector.export_data(
+                score=self.game.game_vars.score,
+                final_stage=self.game.game_vars.stage_num,
+            )
+
+            # JSON 문자열로 변환
+            json_data = json.dumps(game_data)
+
+            # JavaScript로 데이터 전달 (Pyxel 웹 환경)
+            try:
+                import js
+                
+                # 부모 창으로 메시지 전송
+                message = {
+                    "type": "GAME_COMPLETED",
+                    "data": json_data
+                }
+                js.window.parent.postMessage(js.JSON.stringify(message), "*")
+                js.console.log("Game Over - Data sent to parent window")
+            except ImportError:
+                # 로컬 실행 환경
+                print("Game Over!")
+                print(f"Final Score: {self.game.game_vars.score}")
+
+        except Exception as e:
+            print(f"Failed to export game over data: {e}")
 
     def update_player_spawned(self):
         self.player.update_spawned()
@@ -151,8 +229,7 @@ class GameStateStage:
             self.switch_state(State.PLAY)
 
     def update_stage_clear(self):
-        if self.state_time >= STAGE_CLEAR_FRAMES and \
-            not is_music_playing():
+        if self.state_time >= STAGE_CLEAR_FRAMES and not is_music_playing():
             self.game.go_to_next_stage()
 
     def update(self):
@@ -203,12 +280,11 @@ class GameStateStage:
         if self.state == State.PLAY and self.player.remove:
             self.switch_state(State.PLAYER_DEAD)
             self.player_shots.clear()
-    
+
     def draw(self):
         self.background.draw()
 
-        if self.state != State.PLAYER_DEAD and \
-            self.state != State.GAME_OVER:
+        if self.state != State.PLAYER_DEAD and self.state != State.GAME_OVER:
             self.player.draw()
 
         sprites_draw(self.powerups)
@@ -231,4 +307,3 @@ class GameStateStage:
                         self.font.draw_text(80, 88, "LEAVING VORTEX")
                     else:
                         self.font.draw_text(80, 88, "ENTERING VORTEX")
-    
