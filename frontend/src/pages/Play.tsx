@@ -59,37 +59,50 @@ export default function Play() {
     )
     const streamUrl = useMemo(() => streamUrlForModel(modelId) ?? '', [modelId])
 
-    // 게임 완료 감지 - postMessage 이벤트 리스너
+    // 게임 완료 감지 - localStorage 폴링
     useEffect(() => {
         if (!isRunning) return
 
-        const handleMessage = (event: MessageEvent) => {
+        let lastTimestamp = localStorage.getItem('pyxelGameTimestamp') || '0'
+
+        const checkGameCompletion = () => {
             try {
-                // 메시지 파싱
-                const message = typeof event.data === 'string' ? JSON.parse(event.data) : event.data
-                
-                console.log('Received message:', message)
-                
-                // 게임 완료 메시지 확인
-                if (message.type === 'GAME_COMPLETED' && message.data) {
-                    const gameDataStr = typeof message.data === 'string' ? message.data : JSON.stringify(message.data)
-                    const data: GameData = JSON.parse(gameDataStr)
+                const completed = localStorage.getItem('pyxelGameCompleted')
+                const gameDataStr = localStorage.getItem('pyxelGameData')
+                const timestamp = localStorage.getItem('pyxelGameTimestamp') || '0'
+
+                console.log('Checking game completion:', { completed, hasData: !!gameDataStr, timestamp })
+
+                // 새로운 게임 완료 데이터 확인 (타임스탬프로 중복 체크)
+                if (completed === 'true' && gameDataStr && timestamp !== lastTimestamp) {
+                    console.log('Game completed detected!')
                     
-                    console.log('Game completed with data:', data)
+                    const data: GameData = JSON.parse(gameDataStr)
+                    console.log('Game data:', data)
                     
                     setGameData(data)
                     setShowSubmit(true)
+                    
+                    // 타임스탬프 업데이트 (중복 처리 방지)
+                    lastTimestamp = timestamp
+                    
+                    // localStorage 클리어
+                    localStorage.removeItem('pyxelGameCompleted')
+                    localStorage.removeItem('pyxelGameData')
                 }
             } catch (error) {
-                console.error('Failed to parse game data:', error)
+                console.error('Failed to check game completion:', error)
             }
         }
 
-        // 메시지 이벤트 리스너 등록
-        window.addEventListener('message', handleMessage)
+        // 초기 체크
+        checkGameCompletion()
+
+        // 500ms마다 체크
+        const interval = setInterval(checkGameCompletion, 500)
 
         return () => {
-            window.removeEventListener('message', handleMessage)
+            clearInterval(interval)
         }
     }, [isRunning])
 

@@ -46,17 +46,16 @@ class GameStateComplete:
             json_data = json.dumps(game_data)
 
             # JavaScript로 데이터 전달 (Pyxel 웹 환경)
-            # postMessage를 사용하여 부모 window에 전달
+            # localStorage를 사용하여 데이터 저장
             try:
                 import js
                 
-                # 부모 창으로 메시지 전송
-                message = {
-                    "type": "GAME_COMPLETED",
-                    "data": json_data
-                }
-                js.window.parent.postMessage(js.JSON.stringify(message), "*")
-                js.console.log("Game completed - Data sent to parent window")
+                # localStorage에 게임 데이터 저장
+                js.localStorage.setItem("pyxelGameData", json_data)
+                js.localStorage.setItem("pyxelGameCompleted", "true")
+                js.localStorage.setItem("pyxelGameTimestamp", str(js.Date.now()))
+                
+                js.console.log("Game completed - Data saved to localStorage")
             except ImportError:
                 # 로컬 실행 환경에서는 파일로 저장
                 print("Game completed!")

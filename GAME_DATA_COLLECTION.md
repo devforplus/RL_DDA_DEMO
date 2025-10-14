@@ -16,8 +16,9 @@
   - 최종 도달 스테이지
 
 ### 2. JavaScript-Python 통신
-- **postMessage 기반**: iframe 내부에서 실행되는 Pyxel 게임이 부모 페이지로 데이터 전송
-- **게임 종료 시 자동 전송**: 게임 오버 또는 게임 완료 시 자동으로 데이터를 프론트엔드로 전달
+- **localStorage 기반**: iframe 내부에서 실행되는 Pyxel 게임이 localStorage에 데이터 저장
+- **폴링 방식**: 프론트엔드에서 500ms마다 localStorage를 체크하여 게임 완료 감지
+- **게임 종료 시 자동 전송**: 게임 오버 또는 게임 완료 시 자동으로 데이터를 localStorage에 저장
 
 ### 3. 닉네임 입력 및 점수 등록
 - **게임 종료 후 UI 표시**: 게임 완료 시 통계와 함께 닉네임 입력 폼 표시
@@ -144,15 +145,19 @@ class GameDataCollector:
 
 - **Game**: Pyxel (Python)
 - **Frontend**: React + TypeScript + Vite
-- **Communication**: postMessage API (iframe ↔ parent window)
+- **Communication**: localStorage (iframe ↔ parent window)
 - **Data Format**: JSON
 
 ## 개발자 노트
 
 ### iframe 통신 문제 해결
 - 초기에는 `window` 객체에 직접 접근하려 했으나, iframe 격리 문제로 실패
-- `postMessage`를 사용하여 iframe에서 부모 창으로 안전하게 데이터 전달
-- Pyxel의 `js` 모듈을 활용하여 Python에서 JavaScript API 호출
+- `postMessage`를 시도했으나 Pyxel 웹 환경에서 안정적으로 작동하지 않음
+- **최종 해결책**: `localStorage` 사용
+  - iframe과 부모 페이지가 같은 origin일 때 localStorage 공유
+  - Python에서 `js.localStorage.setItem()`으로 데이터 저장
+  - 프론트엔드에서 주기적으로 localStorage 폴링하여 게임 완료 감지
+  - 타임스탬프를 사용하여 중복 처리 방지
 
 ### 게임 빌드
 게임 코드 수정 후 다시 빌드:
