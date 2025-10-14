@@ -76,16 +76,16 @@ export default function Play() {
                 // 새로운 게임 완료 데이터 확인 (타임스탬프로 중복 체크)
                 if (completed === 'true' && gameDataStr && timestamp !== lastTimestamp) {
                     console.log('Game completed detected!')
-                    
+
                     const data: GameData = JSON.parse(gameDataStr)
                     console.log('Game data:', data)
-                    
+
                     setGameData(data)
                     setShowSubmit(true)
-                    
+
                     // 타임스탬프 업데이트 (중복 처리 방지)
                     lastTimestamp = timestamp
-                    
+
                     // localStorage 클리어
                     localStorage.removeItem('pyxelGameCompleted')
                     localStorage.removeItem('pyxelGameData')
@@ -198,32 +198,33 @@ export default function Play() {
                     maxWidth: 600,
                     marginTop: 24,
                     padding: 24,
-                    background: '#1a1a2e',
+                    background: '#2a2d45',
                     borderRadius: 12,
-                    border: '2px solid #5a62f1'
+                    border: '2px solid #6b73ff',
+                    boxShadow: '0 4px 20px rgba(107, 115, 255, 0.3)'
                 }}>
-                    <h3 style={{ margin: 0, color: '#5a62f1' }}>🎮 게임 종료!</h3>
-
-                    <div style={{ display: 'grid', gap: 8, fontSize: 14 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <h3 style={{ margin: 0, color: '#8b93ff', fontSize: 20 }}>🎮 게임 종료!</h3>
+                    
+                    <div style={{ display: 'grid', gap: 10, fontSize: 15 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e0e0e0' }}>
                             <span>최종 점수:</span>
-                            <strong style={{ color: '#5a62f1', fontSize: 16 }}>{gameData.score}</strong>
+                            <strong style={{ color: '#6b73ff', fontSize: 18 }}>{gameData.score}</strong>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e0e0e0' }}>
                             <span>도달 스테이지:</span>
-                            <strong>{gameData.final_stage}</strong>
+                            <strong style={{ color: '#ffffff' }}>{gameData.final_stage}</strong>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e0e0e0' }}>
                             <span>플레이 시간:</span>
-                            <strong>{gameData.statistics.play_duration.toFixed(1)}초</strong>
+                            <strong style={{ color: '#ffffff' }}>{gameData.statistics.play_duration.toFixed(1)}초</strong>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e0e0e0' }}>
                             <span>적 처치:</span>
-                            <strong>{gameData.statistics.enemies_destroyed}</strong>
+                            <strong style={{ color: '#ffffff' }}>{gameData.statistics.enemies_destroyed}</strong>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e0e0e0' }}>
                             <span>명중률:</span>
-                            <strong>
+                            <strong style={{ color: '#ffffff' }}>
                                 {gameData.statistics.shots_fired > 0
                                     ? ((gameData.statistics.hits / gameData.statistics.shots_fired) * 100).toFixed(1)
                                     : '0'}%
@@ -231,8 +232,8 @@ export default function Play() {
                         </div>
                     </div>
 
-                    <div style={{ borderTop: '1px solid #333', paddingTop: 16 }}>
-                        <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>
+                    <div style={{ borderTop: '1px solid #4a4d65', paddingTop: 16 }}>
+                        <label style={{ display: 'block', marginBottom: 8, fontWeight: 500, color: '#e0e0e0', fontSize: 15 }}>
                             닉네임을 입력하여 점수를 등록하세요:
                         </label>
                         <input
@@ -246,9 +247,9 @@ export default function Play() {
                                 padding: '12px 16px',
                                 fontSize: 16,
                                 borderRadius: 8,
-                                border: '2px solid #333',
-                                background: '#0f0f1e',
-                                color: '#fff',
+                                border: '2px solid #4a4d65',
+                                background: '#1a1d35',
+                                color: '#ffffff',
                                 boxSizing: 'border-box'
                             }}
                             autoFocus
@@ -262,12 +263,13 @@ export default function Play() {
                             padding: '14px 24px',
                             borderRadius: 8,
                             border: 'none',
-                            background: submitting || !nickname.trim() ? '#666' : '#5a62f1',
-                            color: '#fff',
+                            background: submitting || !nickname.trim() ? '#5a5a6a' : '#6b73ff',
+                            color: '#ffffff',
                             fontSize: 16,
                             fontWeight: 600,
                             cursor: submitting || !nickname.trim() ? 'not-allowed' : 'pointer',
-                            transition: 'background 0.2s'
+                            transition: 'background 0.2s',
+                            boxShadow: submitting || !nickname.trim() ? 'none' : '0 2px 10px rgba(107, 115, 255, 0.4)'
                         }}
                     >
                         {submitting ? '등록 중...' : '점수 등록 및 플레이 데이터 다운로드'}
@@ -277,15 +279,16 @@ export default function Play() {
                         <div style={{
                             padding: 12,
                             borderRadius: 8,
-                            background: submitMessage.includes('✅') ? '#1a4d1a' : '#4d1a1a',
+                            background: submitMessage.includes('✅') ? '#2d5a2d' : '#5a2d2d',
                             textAlign: 'center',
-                            fontWeight: 500
+                            fontWeight: 500,
+                            color: '#ffffff'
                         }}>
                             {submitMessage}
                         </div>
                     )}
 
-                    <div style={{ fontSize: 12, color: '#888', marginTop: 8 }}>
+                    <div style={{ fontSize: 13, color: '#b0b0c0', marginTop: 8 }}>
                         💡 등록하면 게임 플레이 데이터가 JSON 파일로 자동 다운로드됩니다.
                     </div>
                 </div>

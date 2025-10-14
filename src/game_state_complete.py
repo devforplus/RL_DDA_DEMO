@@ -49,12 +49,12 @@ class GameStateComplete:
             # localStorage를 사용하여 데이터 저장
             try:
                 import js
-                
+
                 # localStorage에 게임 데이터 저장
                 js.localStorage.setItem("pyxelGameData", json_data)
                 js.localStorage.setItem("pyxelGameCompleted", "true")
                 js.localStorage.setItem("pyxelGameTimestamp", str(js.Date.now()))
-                
+
                 js.console.log("Game completed - Data saved to localStorage")
             except ImportError:
                 # 로컬 실행 환경에서는 파일로 저장

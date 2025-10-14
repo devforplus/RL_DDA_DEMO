@@ -207,12 +207,12 @@ class GameStateStage:
             # JavaScript로 데이터 전달 (Pyxel 웹 환경)
             try:
                 import js
-                
+
                 # localStorage에 게임 데이터 저장
                 js.localStorage.setItem("pyxelGameData", json_data)
                 js.localStorage.setItem("pyxelGameCompleted", "true")
                 js.localStorage.setItem("pyxelGameTimestamp", str(js.Date.now()))
-                
+
                 js.console.log("Game Over - Data saved to localStorage")
             except ImportError:
                 # 로컬 실행 환경
