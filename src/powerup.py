@@ -38,7 +38,7 @@ TYPE_CYCLE = [
     PowerupType.BOMB,
 ]
 MAX_CYCLE_LEN = len(TYPE_CYCLE)
-MAX_CYCLE_GAP_LEN = 600  # every n enemies killed spawn next pup
+MAX_CYCLE_GAP_LEN = 999999  # every n enemies killed spawn next pup
 
 
 class Powerup(Sprite):
