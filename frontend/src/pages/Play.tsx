@@ -2,36 +2,18 @@ import { useParams } from 'react-router-dom'
 import { useMemo, useState, useEffect } from 'react'
 import { streamUrlForModel } from '../config'
 import MjpegViewer from '../components/MjpegViewer'
-import { submitScore, submitGamePlayData } from '../api/scores'
+import {
+    submitGamePlayData,
+    type GameStatistics,
+    type GamePlayFrame
+} from '../api/scores'
 
-// 게임 데이터 타입 정의
+// 게임 데이터 타입 정의 (Pyxel에서 받는 데이터)
 interface GameData {
     score: number
     final_stage: number
-    statistics: {
-        total_frames: number
-        play_duration: number
-        enemies_destroyed: number
-        shots_fired: number
-        hits: number
-        deaths: number
-    }
-    frames: Array<{
-        frame_number: number
-        player_x: number
-        player_y: number
-        player_lives: number
-        player_score: number
-        current_weapon: number
-        input_left: number
-        input_right: number
-        input_up: number
-        input_down: number
-        input_button1: number
-        input_button2: number
-        stage_num: number
-        timestamp: number
-    }>
+    statistics: GameStatistics
+    frames: GamePlayFrame[]
 }
 
 // window 객체 타입 확장
@@ -117,21 +99,8 @@ export default function Play() {
         setSubmitMessage('')
 
         try {
-            // 1. 점수 정보를 백엔드로 전송
-            const scoreRes = await submitScore({
-                nickname: nickname.trim(),
-                score: gameData.score,
-                modelId,
-            })
-
-            if (!('ok' in scoreRes && scoreRes.ok)) {
-                setSubmitMessage('❌ 점수 등록에 실패했습니다. 다시 시도해주세요.')
-                setSubmitting(false)
-                return
-            }
-
-            // 2. 게임 플레이 데이터를 백엔드로 전송
-            const gamePlayRes = await submitGamePlayData({
+            // 게임 플레이 데이터 제출 (점수 포함)
+            const result = await submitGamePlayData({
                 nickname: nickname.trim(),
                 score: gameData.score,
                 final_stage: gameData.final_stage,
@@ -140,9 +109,9 @@ export default function Play() {
                 frames: gameData.frames,
             })
 
-            if ('ok' in gamePlayRes && gamePlayRes.ok) {
-                setSubmitMessage('✅ 점수와 게임 데이터가 등록되었습니다!')
-                
+            if ('ok' in result && result.ok) {
+                setSubmitMessage('✅ 게임 데이터가 등록되었습니다!')
+
                 // 3초 후 UI 초기화
                 setTimeout(() => {
                     setShowSubmit(false)
@@ -151,7 +120,8 @@ export default function Play() {
                     setSubmitMessage('')
                 }, 3000)
             } else {
-                setSubmitMessage('⚠️ 점수는 등록되었으나 게임 데이터 전송에 실패했습니다.')
+                const errorMsg = 'error' in result ? result.error : '알 수 없는 오류'
+                setSubmitMessage(`❌ 등록 실패: ${errorMsg}`)
             }
         } catch (error) {
             console.error('Submit error:', error)
@@ -162,10 +132,16 @@ export default function Play() {
     }
 
     return (
-        <div>
-            <h2>플레이</h2>
-            <div>선택된 모델: {modelId ?? '(없음)'}</div>
-            <div style={{ position: 'relative', width: 512, height: 384, marginTop: 12, background: '#111' }}>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '40px 20px',
+            minHeight: 'calc(100vh - 60px)',
+            background: '#0a0a0a'
+        }}>
+            <h2 style={{ marginBottom: 32, color: '#fff' }}>🎮 플레이</h2>
+            <div style={{ position: 'relative', width: 768, height: 576, background: '#111', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
                 {!isRunning && (
                     <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <button
@@ -181,14 +157,14 @@ export default function Play() {
                         <iframe
                             title="pyxel-game"
                             src={iframeSrc}
-                            width={512}
-                            height={384}
+                            width={768}
+                            height={576}
                             style={{ border: 'none' }}
                             allow="autoplay; fullscreen; gamepad"
                         />
                         {streamUrl && (
                             <div style={{ marginTop: 8 }}>
-                                <MjpegViewer src={streamUrl} width={512} height={384} />
+                                <MjpegViewer src={streamUrl} width={768} height={576} />
                             </div>
                         )}
                     </div>
@@ -199,16 +175,17 @@ export default function Play() {
                 <div style={{
                     display: 'grid',
                     gap: 16,
-                    maxWidth: 600,
-                    marginTop: 24,
-                    padding: 24,
-                    background: '#2a2d45',
-                    borderRadius: 12,
-                    border: '2px solid #6b73ff',
-                    boxShadow: '0 4px 20px rgba(107, 115, 255, 0.3)'
+                    width: '100%',
+                    maxWidth: 768,
+                    marginTop: 32,
+                    padding: 32,
+                    background: '#1a1a2e',
+                    borderRadius: 16,
+                    border: '2px solid #5a62f1',
+                    boxShadow: '0 8px 32px rgba(90, 98, 241, 0.4)'
                 }}>
-                    <h3 style={{ margin: 0, color: '#8b93ff', fontSize: 20 }}>🎮 게임 종료!</h3>
-                    
+                    <h3 style={{ margin: 0, color: '#5a62f1', fontSize: 24, textAlign: 'center' }}>🎮 게임 종료!</h3>
+
                     <div style={{ display: 'grid', gap: 10, fontSize: 15 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e0e0e0' }}>
                             <span>최종 점수:</span>
@@ -293,7 +270,7 @@ export default function Play() {
                     )}
 
                     <div style={{ fontSize: 13, color: '#b0b0c0', marginTop: 8 }}>
-                        💡 등록하면 점수와 게임 플레이 데이터가 데이터베이스에 저장됩니다.
+                        💡 등록하면 게임 플레이 데이터가 데이터베이스에 저장되고 리더보드에 표시됩니다.
                     </div>
                 </div>
             )}
