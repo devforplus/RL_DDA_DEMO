@@ -1,3 +1,13 @@
+import { API_ENDPOINTS } from '../config'
+
+// ============================================
+// 타입 정의
+// ============================================
+
+/**
+ * 리플레이 메타데이터
+ * 백엔드 API 스펙: GET /api/replays/{replay_id}
+ */
 export type ReplayMeta = {
     id: string
     session_id: string
@@ -12,11 +22,21 @@ export type ReplayMeta = {
     expires_in?: number
 }
 
-const BASE = (import.meta as any).env.VITE_API_BASE ?? ''
+// ============================================
+// API 함수들
+// ============================================
 
+/**
+ * 리플레이 메타데이터 조회
+ * @param replayId 리플레이 ID
+ * @returns 리플레이 메타데이터 (S3 presigned URL 포함)
+ * @throws Error 네트워크 오류 또는 서버 오류 시
+ */
 export async function fetchReplayMeta(replayId: string): Promise<ReplayMeta> {
-    const res = await fetch(`${BASE}/api/replays/${encodeURIComponent(replayId)}`)
-    if (!res.ok) throw new Error(`failed to load replay meta: HTTP ${res.status}`)
+    const res = await fetch(API_ENDPOINTS.REPLAYS(replayId))
+    if (!res.ok) {
+        throw new Error(`리플레이 메타데이터 로드 실패: HTTP ${res.status}`)
+    }
     return res.json()
 }
 
