@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom'
 import ReplayPlayer from '../components/ReplayPlayer'
 import MjpegViewer from '../components/MjpegViewer'
 import { streamUrlForModel } from '../config'
-import { fetchReplayMeta } from '../api/replays'
 
 export default function Watch() {
   const params = useParams()
