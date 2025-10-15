@@ -1,19 +1,38 @@
 import { useEffect, useState } from 'react'
-import { fetchLeaderboard, type Score } from '../api/scores'
+import { fetchRankings, type Score } from '../api/scores'
 
 export default function Rank() {
     const [rows, setRows] = useState<Score[] | null>(null)
     const [error, setError] = useState<string | null>(null)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
+    const [modelFilter, setModelFilter] = useState<string>('')
+    const [pageSize, setPageSize] = useState(100)
 
     const loadLeaderboard = async () => {
         setLoading(true)
         setError(null)
         try {
-            const data = await fetchLeaderboard()
-            setRows(data)
+            console.log('랭킹 데이터 요청 중...', { pageSize, modelFilter })
+            const data = await fetchRankings({
+                page: 1,
+                page_size: pageSize,
+                model_id: modelFilter || undefined,
+            })
+            console.log('받은 데이터:', data)
+            console.log('데이터 타입:', typeof data, Array.isArray(data))
+
+            // 안전하게 배열로 설정
+            if (Array.isArray(data)) {
+                setRows(data)
+            } else {
+                console.error('데이터가 배열이 아닙니다:', data)
+                setRows([])
+                setError('서버에서 잘못된 형식의 데이터를 받았습니다.')
+            }
         } catch (e) {
-            setError(String(e))
+            console.error('랭킹 로딩 에러:', e)
+            setRows([]) // 에러 시 빈 배열로 설정
+            setError(e instanceof Error ? e.message : String(e))
         } finally {
             setLoading(false)
         }
@@ -21,7 +40,7 @@ export default function Rank() {
 
     useEffect(() => {
         loadLeaderboard()
-    }, [])
+    }, [modelFilter, pageSize])
 
     const getRankColor = (rank: number) => {
         if (rank === 1) return '#FFD700' // 금
@@ -38,37 +57,103 @@ export default function Rank() {
     }
 
     return (
-        <div style={{ display: 'grid', gap: 20, maxWidth: 900, margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{
+            display: 'grid',
+            gap: 20,
+            padding: '20px 40px',
+            minHeight: 'calc(100vh - 80px)',
+            background: '#0f0f1e',
+            color: '#fff'
+        }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
                 <h2 style={{ margin: 0 }}>🏆 리더보드</h2>
-                <button
-                    onClick={loadLeaderboard}
-                    disabled={loading}
-                    style={{
-                        padding: '10px 20px',
-                        borderRadius: 8,
-                        border: 'none',
-                        background: loading ? '#666' : '#5a62f1',
-                        color: '#fff',
-                        fontSize: 14,
-                        fontWeight: 600,
-                        cursor: loading ? 'not-allowed' : 'pointer',
-                        transition: 'background 0.2s'
-                    }}
-                >
-                    {loading ? '새로고침 중...' : '🔄 새로고침'}
-                </button>
+
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                    {/* 모델 필터 */}
+                    <select
+                        value={modelFilter}
+                        onChange={(e) => setModelFilter(e.target.value)}
+                        disabled={loading}
+                        style={{
+                            padding: '8px 12px',
+                            borderRadius: 8,
+                            border: '1px solid #444',
+                            background: '#1a1a2e',
+                            color: '#fff',
+                            fontSize: 14,
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                        }}
+                    >
+                        <option value="">전체 모델</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="medium">Medium</option>
+                        <option value="master">Master</option>
+                    </select>
+
+                    {/* 페이지 크기 */}
+                    <select
+                        value={pageSize}
+                        onChange={(e) => setPageSize(Number(e.target.value))}
+                        disabled={loading}
+                        style={{
+                            padding: '8px 12px',
+                            borderRadius: 8,
+                            border: '1px solid #444',
+                            background: '#1a1a2e',
+                            color: '#fff',
+                            fontSize: 14,
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                        }}
+                    >
+                        <option value="10">10개</option>
+                        <option value="25">25개</option>
+                        <option value="50">50개</option>
+                        <option value="100">100개</option>
+                    </select>
+
+                    {/* 새로고침 버튼 */}
+                    <button
+                        onClick={loadLeaderboard}
+                        disabled={loading}
+                        style={{
+                            padding: '10px 20px',
+                            borderRadius: 8,
+                            border: 'none',
+                            background: loading ? '#666' : '#5a62f1',
+                            color: '#fff',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                            transition: 'background 0.2s'
+                        }}
+                    >
+                        {loading ? '새로고침 중...' : '🔄 새로고침'}
+                    </button>
+                </div>
             </div>
 
             {error && (
                 <div style={{
-                    padding: 16,
-                    borderRadius: 8,
+                    padding: 20,
+                    borderRadius: 12,
                     background: '#4d1a1a',
-                    border: '1px solid crimson',
-                    color: 'crimson'
+                    border: '2px solid crimson',
+                    color: '#fff'
                 }}>
-                    ❌ {error}
+                    <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: 'crimson' }}>
+                        ❌ 오류 발생
+                    </div>
+                    <div style={{ fontSize: 14, marginBottom: 16, color: '#ffaaaa' }}>
+                        {error}
+                    </div>
+                    <details style={{ fontSize: 12, color: '#ccc' }}>
+                        <summary style={{ cursor: 'pointer', marginBottom: 8 }}>해결 방법</summary>
+                        <ul style={{ margin: 0, paddingLeft: 20 }}>
+                            <li>백엔드 서버가 실행 중인지 확인하세요 (localhost:8000)</li>
+                            <li>브라우저 개발자 도구(F12) → Network 탭에서 API 요청 상태를 확인하세요</li>
+                            <li>Console 탭에서 자세한 에러 로그를 확인하세요</li>
+                        </ul>
+                    </details>
                 </div>
             )}
 
@@ -102,38 +187,25 @@ export default function Rank() {
                             <tr style={{ background: '#0f0f1e', borderBottom: '2px solid #5a62f1' }}>
                                 <th style={{
                                     textAlign: 'center',
-                                    padding: '16px 12px',
+                                    padding: '16px 24px',
                                     fontWeight: 600,
                                     color: '#5a62f1',
-                                    width: '80px'
+                                    width: '10%'
                                 }}>순위</th>
                                 <th style={{
                                     textAlign: 'left',
-                                    padding: '16px 12px',
+                                    padding: '16px 32px',
                                     fontWeight: 600,
-                                    color: '#5a62f1'
+                                    color: '#5a62f1',
+                                    width: '10%'
                                 }}>닉네임</th>
                                 <th style={{
-                                    textAlign: 'right',
-                                    padding: '16px 12px',
+                                    textAlign: 'center',
+                                    padding: '16px 100px',
                                     fontWeight: 600,
                                     color: '#5a62f1',
-                                    width: '150px'
+                                    width: '30%'
                                 }}>점수</th>
-                                <th style={{
-                                    textAlign: 'center',
-                                    padding: '16px 12px',
-                                    fontWeight: 600,
-                                    color: '#5a62f1',
-                                    width: '120px'
-                                }}>모델</th>
-                                <th style={{
-                                    textAlign: 'center',
-                                    padding: '16px 12px',
-                                    fontWeight: 600,
-                                    color: '#5a62f1',
-                                    width: '140px'
-                                }}>날짜</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -155,7 +227,7 @@ export default function Rank() {
                                         }}
                                     >
                                         <td style={{
-                                            padding: '16px 12px',
+                                            padding: '16px 24px',
                                             textAlign: 'center',
                                             fontWeight: 600,
                                             fontSize: rank <= 3 ? 18 : 16,
@@ -164,41 +236,20 @@ export default function Rank() {
                                             {getRankEmoji(rank)} {rank}
                                         </td>
                                         <td style={{
-                                            padding: '16px 12px',
+                                            padding: '16px 32px',
                                             fontWeight: rank <= 3 ? 600 : 400,
                                             fontSize: rank <= 3 ? 16 : 14
                                         }}>
                                             {r.nickname}
                                         </td>
                                         <td style={{
-                                            padding: '16px 12px',
-                                            textAlign: 'right',
+                                            padding: '16px 100px',
+                                            textAlign: 'center',
                                             fontWeight: 600,
                                             fontSize: rank <= 3 ? 18 : 16,
                                             color: rank <= 3 ? '#5a62f1' : '#fff'
                                         }}>
                                             {r.score.toLocaleString()}
-                                        </td>
-                                        <td style={{
-                                            padding: '16px 12px',
-                                            textAlign: 'center',
-                                            color: '#888',
-                                            fontSize: 14
-                                        }}>
-                                            {r.modelId ?? '-'}
-                                        </td>
-                                        <td style={{
-                                            padding: '16px 12px',
-                                            textAlign: 'center',
-                                            color: '#888',
-                                            fontSize: 12
-                                        }}>
-                                            {r.createdAt ? new Date(r.createdAt).toLocaleDateString('ko-KR', {
-                                                month: 'short',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            }) : '-'}
                                         </td>
                                     </tr>
                                 )
