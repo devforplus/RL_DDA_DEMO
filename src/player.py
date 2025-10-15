@@ -119,20 +119,6 @@ class Player(Sprite):
         elif self.input.is_pressing(input.BUTTON_1):
             self.shoot()
 
-        # Debug
-        # gv = self.game_state.game.game_vars
-        # if px.btnp(px.KEY_Z):
-        #     gv.current_weapon = 0
-        # elif px.btnp(px.KEY_X):
-        #     gv.current_weapon = 1
-        # elif px.btnp(px.KEY_C):
-        #     gv.current_weapon = 2
-
-        # if px.btnp(px.KEY_1):
-        #     gv.decrease_all_weapon_levels(1)
-        # elif px.btnp(px.KEY_2):
-        #     gv.increase_all_weapon_levels(1)
-
     def draw(self):
         if self.is_invincible() and px.frame_count % 2 == 0:
             return
