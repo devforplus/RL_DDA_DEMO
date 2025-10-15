@@ -28,7 +28,7 @@ git push origin main
 
 **환경 변수:**
 ```
-VITE_API_BASE=https://devfor.plus
+VITE_API_BASE=https://api.devfor.plus
 ```
 
 5. "Deploy" 클릭
@@ -73,9 +73,96 @@ app.add_middleware(
 2. Vercel 대시보드에서 빌드 로그 확인
 3. 환경 변수가 올바르게 설정되었는지 확인
 
+## 🌐 커스텀 도메인 설정 (devfor.plus 사용)
+
+### 도메인 구조
+- **프론트엔드**: `devfor.plus` (또는 `www.devfor.plus`)
+- **백엔드 API**: `api.devfor.plus`
+
+### 설정 방법
+
+#### 1. AWS 백엔드 도메인 설정
+
+AWS에서 백엔드를 `api.devfor.plus`로 설정:
+
+**DNS 레코드 추가 (Route 53 또는 도메인 제공업체):**
+```
+Type: A 또는 CNAME
+Name: api
+Value: [AWS 서버 IP 또는 주소]
+```
+
+#### 2. Vercel 프론트엔드 도메인 설정
+
+**2-1. Vercel 대시보드에서 설정:**
+1. Vercel 프로젝트 페이지 접속
+2. **Settings** > **Domains** 클릭
+3. **Add Domain** 입력:
+   - `devfor.plus` 또는
+   - `www.devfor.plus`
+4. **Add** 클릭
+
+**2-2. DNS 레코드 설정:**
+
+Vercel이 제공하는 DNS 레코드를 도메인 제공업체에 추가:
+
+**Option A: 루트 도메인 (devfor.plus)**
+```
+Type: A
+Name: @
+Value: 76.76.21.21
+```
+
+**Option B: www 서브도메인 (www.devfor.plus)**
+```
+Type: CNAME
+Name: www
+Value: cname.vercel-dns.com
+```
+
+**루트 도메인에서 www로 리다이렉트 설정:**
+```
+Type: A
+Name: @
+Value: 76.76.21.21
+
+Type: CNAME
+Name: www
+Value: cname.vercel-dns.com
+```
+
+#### 3. CORS 설정 업데이트
+
+백엔드 서버(`api.devfor.plus`)의 CORS 설정 업데이트:
+
+```python
+# FastAPI 백엔드 예시
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://devfor.plus",
+        "https://www.devfor.plus",
+        "http://localhost:5173",  # 로컬 개발용
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+#### 4. 확인
+
+- **프론트엔드**: https://devfor.plus 접속
+- **백엔드 API**: https://api.devfor.plus/api/gameplay/rankings 테스트
+
+### DNS 전파 시간
+- DNS 변경 후 최대 24-48시간 소요될 수 있음
+- 보통 몇 분 ~ 몇 시간 내 완료
+
 ## 📝 참고
 
 - **배포 URL 설정**: Vercel에서 커스텀 도메인 설정 가능
 - **환경 변수 수정**: Vercel 대시보드 > Settings > Environment Variables
 - **롤백**: Vercel 대시보드에서 이전 배포 버전으로 즉시 롤백 가능
+- **SSL 인증서**: Vercel과 AWS 모두 자동으로 SSL 인증서 발급
 
