@@ -34,7 +34,7 @@ export default function Replay() {
 
     return (
         <div style={{ display: 'grid', gap: 12 }}>
-            <h2>리플레이</h2>
+            {/* <h2>리플레이</h2>
             {loading && <div style={{ color: '#666' }}>로딩 중…</div>}
             {error && <div style={{ color: 'crimson' }}>{error}</div>}
             {meta && (
@@ -44,7 +44,8 @@ export default function Replay() {
                     {meta.frames_count != null && <div>프레임: {meta.frames_count}</div>}
                 </div>
             )}
-            <ReplayPlayer url={dataUrl} />
+            <ReplayPlayer url={dataUrl} /> */}
+            <h1>현재 미구현 기능입니다.</h1>
         </div>
     )
 }

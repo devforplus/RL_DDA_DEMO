@@ -69,3 +69,9 @@ MANIFEST
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Lock files #
+###############
+requirements-dev.lock
+requirements.lock
+pnpm-lock.yaml
