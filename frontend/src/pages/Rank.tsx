@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react'
 import { fetchRankings, type Score } from '../api/scores'
+import { useTheme } from '../contexts/ThemeContext'
+import { darkTheme, lightTheme } from '../theme/colors'
 
 export default function Rank() {
+    const { theme } = useTheme()
+    const colors = theme === 'dark' ? darkTheme : lightTheme
+    
     const [rows, setRows] = useState<Score[] | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
@@ -62,11 +67,11 @@ export default function Rank() {
             gap: 20,
             padding: '20px 40px',
             minHeight: 'calc(100vh - 80px)',
-            background: '#0f0f1e',
-            color: '#fff'
+            background: colors.background,
+            color: colors.text
         }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-                <h2 style={{ margin: 0 }}>🏆 리더보드</h2>
+                <h2 style={{ margin: 0, color: colors.text }}>🏆 리더보드</h2>
 
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                     {/* 모델 필터 */}
@@ -77,9 +82,9 @@ export default function Rank() {
                         style={{
                             padding: '8px 12px',
                             borderRadius: 8,
-                            border: '1px solid #444',
-                            background: '#1a1a2e',
-                            color: '#fff',
+                            border: `1px solid ${colors.cardBorder}`,
+                            background: colors.inputBg,
+                            color: colors.text,
                             fontSize: 14,
                             cursor: loading ? 'not-allowed' : 'pointer',
                         }}
@@ -98,9 +103,9 @@ export default function Rank() {
                         style={{
                             padding: '8px 12px',
                             borderRadius: 8,
-                            border: '1px solid #444',
-                            background: '#1a1a2e',
-                            color: '#fff',
+                            border: `1px solid ${colors.cardBorder}`,
+                            background: colors.inputBg,
+                            color: colors.text,
                             fontSize: 14,
                             cursor: loading ? 'not-allowed' : 'pointer',
                         }}
@@ -119,7 +124,7 @@ export default function Rank() {
                             padding: '10px 20px',
                             borderRadius: 8,
                             border: 'none',
-                            background: loading ? '#666' : '#5a62f1',
+                            background: loading ? colors.textTertiary : colors.primary,
                             color: '#fff',
                             fontSize: 14,
                             fontWeight: 600,
@@ -136,17 +141,17 @@ export default function Rank() {
                 <div style={{
                     padding: 20,
                     borderRadius: 12,
-                    background: '#4d1a1a',
-                    border: '2px solid crimson',
-                    color: '#fff'
+                    background: colors.errorBg,
+                    border: `2px solid ${colors.error}`,
+                    color: colors.text
                 }}>
-                    <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: 'crimson' }}>
+                    <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, color: colors.error }}>
                         ❌ 오류 발생
                     </div>
-                    <div style={{ fontSize: 14, marginBottom: 16, color: '#ffaaaa' }}>
+                    <div style={{ fontSize: 14, marginBottom: 16, color: colors.textSecondary }}>
                         {error}
                     </div>
-                    <details style={{ fontSize: 12, color: '#ccc' }}>
+                    <details style={{ fontSize: 12, color: colors.textTertiary }}>
                         <summary style={{ cursor: 'pointer', marginBottom: 8 }}>해결 방법</summary>
                         <ul style={{ margin: 0, paddingLeft: 20 }}>
                             <li>백엔드 서버가 실행 중인지 확인하세요 (localhost:8000)</li>
@@ -158,15 +163,15 @@ export default function Rank() {
             )}
 
             {!rows ? (
-                <div style={{ textAlign: 'center', padding: 40, color: '#888' }}>
+                <div style={{ textAlign: 'center', padding: 40, color: colors.textTertiary }}>
                     불러오는 중...
                 </div>
             ) : rows.length === 0 ? (
                 <div style={{
                     textAlign: 'center',
                     padding: 40,
-                    color: '#888',
-                    background: '#1a1a2e',
+                    color: colors.textTertiary,
+                    background: colors.cardBg,
                     borderRadius: 12
                 }}>
                     아직 등록된 점수가 없습니다.<br />
@@ -174,36 +179,36 @@ export default function Rank() {
                 </div>
             ) : (
                 <div style={{
-                    background: '#1a1a2e',
+                    background: colors.cardBg,
                     borderRadius: 12,
                     overflow: 'hidden',
-                    border: '1px solid #333'
+                    border: `1px solid ${colors.cardBorder}`
                 }}>
                     <table style={{
                         width: '100%',
                         borderCollapse: 'collapse'
                     }}>
                         <thead>
-                            <tr style={{ background: '#0f0f1e', borderBottom: '2px solid #5a62f1' }}>
+                            <tr style={{ background: colors.backgroundTertiary, borderBottom: `2px solid ${colors.primary}` }}>
                                 <th style={{
                                     textAlign: 'center',
                                     padding: '16px 24px',
                                     fontWeight: 600,
-                                    color: '#5a62f1',
+                                    color: colors.primary,
                                     width: '10%'
                                 }}>순위</th>
                                 <th style={{
                                     textAlign: 'left',
                                     padding: '16px 32px',
                                     fontWeight: 600,
-                                    color: '#5a62f1',
+                                    color: colors.primary,
                                     width: '10%'
                                 }}>닉네임</th>
                                 <th style={{
                                     textAlign: 'center',
                                     padding: '16px 100px',
                                     fontWeight: 600,
-                                    color: '#5a62f1',
+                                    color: colors.primary,
                                     width: '30%'
                                 }}>점수</th>
                             </tr>
@@ -211,19 +216,22 @@ export default function Rank() {
                         <tbody>
                             {rows.map((r, i) => {
                                 const rank = i + 1
+                                const topRankBg = theme === 'dark' ? 'rgba(90, 98, 241, 0.05)' : 'rgba(90, 98, 241, 0.08)'
+                                const hoverBg = theme === 'dark' ? 'rgba(90, 98, 241, 0.1)' : 'rgba(90, 98, 241, 0.15)'
+                                
                                 return (
                                     <tr
                                         key={r.id}
                                         style={{
-                                            borderBottom: '1px solid #282840',
-                                            background: rank <= 3 ? 'rgba(90, 98, 241, 0.05)' : 'transparent',
+                                            borderBottom: `1px solid ${colors.cardBorder}`,
+                                            background: rank <= 3 ? topRankBg : 'transparent',
                                             transition: 'background 0.2s'
                                         }}
                                         onMouseEnter={(e) => {
-                                            e.currentTarget.style.background = 'rgba(90, 98, 241, 0.1)'
+                                            e.currentTarget.style.background = hoverBg
                                         }}
                                         onMouseLeave={(e) => {
-                                            e.currentTarget.style.background = rank <= 3 ? 'rgba(90, 98, 241, 0.05)' : 'transparent'
+                                            e.currentTarget.style.background = rank <= 3 ? topRankBg : 'transparent'
                                         }}
                                     >
                                         <td style={{
@@ -238,7 +246,8 @@ export default function Rank() {
                                         <td style={{
                                             padding: '16px 32px',
                                             fontWeight: rank <= 3 ? 600 : 400,
-                                            fontSize: rank <= 3 ? 16 : 14
+                                            fontSize: rank <= 3 ? 16 : 14,
+                                            color: colors.text
                                         }}>
                                             {r.nickname}
                                         </td>
@@ -247,7 +256,7 @@ export default function Rank() {
                                             textAlign: 'center',
                                             fontWeight: 600,
                                             fontSize: rank <= 3 ? 18 : 16,
-                                            color: rank <= 3 ? '#5a62f1' : '#fff'
+                                            color: rank <= 3 ? colors.primary : colors.text
                                         }}>
                                             {r.score.toLocaleString()}
                                         </td>
@@ -262,7 +271,7 @@ export default function Rank() {
             <div style={{
                 textAlign: 'center',
                 fontSize: 12,
-                color: '#666',
+                color: colors.textTertiary,
                 padding: '20px 0'
             }}>
                 총 {rows?.length ?? 0}명의 플레이어
