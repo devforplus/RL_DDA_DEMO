@@ -141,34 +141,310 @@ export default function Play() {
             background: '#0a0a0a'
         }}>
             <h2 style={{ marginBottom: 32, color: '#fff' }}>🎮 플레이</h2>
-            <div style={{ position: 'relative', width: 768, height: 576, background: '#111', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
-                {!isRunning && (
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <button
-                            onClick={() => setIsRunning(true)}
-                            style={{ padding: '14px 18px', borderRadius: 8, border: 'none', background: '#5a62f1', color: '#fff', fontSize: 18 }}
-                        >
-                            ▶ Run game
-                        </button>
-                    </div>
-                )}
-                {isRunning && (
-                    <div style={{ display: 'grid', gap: 8 }}>
-                        <iframe
-                            title="pyxel-game"
-                            src={iframeSrc}
-                            width={768}
-                            height={576}
-                            style={{ border: 'none' }}
-                            allow="autoplay; fullscreen; gamepad"
-                        />
-                        {streamUrl && (
-                            <div style={{ marginTop: 8 }}>
-                                <MjpegViewer src={streamUrl} width={768} height={576} />
+
+            <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', width: '100%', maxWidth: 1200, justifyContent: 'center' }}>
+                {/* 메인 게임 영역 */}
+                <div style={{ position: 'relative', width: 768, height: 576, background: '#111', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+                    {!isRunning && (
+                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <button
+                                onClick={() => setIsRunning(true)}
+                                style={{ padding: '14px 18px', borderRadius: 8, border: 'none', background: '#5a62f1', color: '#fff', fontSize: 18 }}
+                            >
+                                ▶ Run game
+                            </button>
+                        </div>
+                    )}
+                    {isRunning && (
+                        <div style={{ display: 'grid', gap: 8 }}>
+                            <iframe
+                                title="pyxel-game"
+                                src={iframeSrc}
+                                width={768}
+                                height={576}
+                                style={{ border: 'none' }}
+                                allow="autoplay; fullscreen; gamepad"
+                            />
+                            {streamUrl && (
+                                <div style={{ marginTop: 8 }}>
+                                    <MjpegViewer src={streamUrl} width={768} height={576} />
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* 조작법 사이드바 */}
+                <div style={{
+                    width: 280,
+                    padding: 24,
+                    background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+                    borderRadius: 12,
+                    border: '1px solid #2a2a3e',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.3)'
+                }}>
+                    <h3 style={{
+                        margin: '0 0 20px 0',
+                        color: '#6b73ff',
+                        fontSize: 20,
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8
+                    }}>
+                        🎯 조작법
+                    </h3>
+
+                    <div style={{ display: 'grid', gap: 16 }}>
+                        {/* 이동 조작 */}
+                        <div>
+                            <div style={{
+                                fontSize: 13,
+                                color: '#9a9aaa',
+                                marginBottom: 8,
+                                fontWeight: 500,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            }}>
+                                이동
                             </div>
-                        )}
+                            <div style={{ display: 'grid', gap: 6 }}>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 8,
+                                    padding: '8px 12px',
+                                    background: '#1a1d35',
+                                    borderRadius: 6,
+                                    border: '1px solid #2a2d45'
+                                }}>
+                                    <kbd style={{
+                                        display: 'inline-block',
+                                        padding: '4px 8px',
+                                        background: '#2a2d45',
+                                        border: '1px solid #3a3d55',
+                                        borderRadius: 4,
+                                        fontSize: 14,
+                                        fontWeight: 600,
+                                        color: '#fff',
+                                        minWidth: 24,
+                                        textAlign: 'center'
+                                    }}>W</kbd>
+                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>위로</span>
+                                </div>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 8,
+                                    padding: '8px 12px',
+                                    background: '#1a1d35',
+                                    borderRadius: 6,
+                                    border: '1px solid #2a2d45'
+                                }}>
+                                    <kbd style={{
+                                        display: 'inline-block',
+                                        padding: '4px 8px',
+                                        background: '#2a2d45',
+                                        border: '1px solid #3a3d55',
+                                        borderRadius: 4,
+                                        fontSize: 14,
+                                        fontWeight: 600,
+                                        color: '#fff',
+                                        minWidth: 24,
+                                        textAlign: 'center'
+                                    }}>A</kbd>
+                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>왼쪽</span>
+                                </div>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 8,
+                                    padding: '8px 12px',
+                                    background: '#1a1d35',
+                                    borderRadius: 6,
+                                    border: '1px solid #2a2d45'
+                                }}>
+                                    <kbd style={{
+                                        display: 'inline-block',
+                                        padding: '4px 8px',
+                                        background: '#2a2d45',
+                                        border: '1px solid #3a3d55',
+                                        borderRadius: 4,
+                                        fontSize: 14,
+                                        fontWeight: 600,
+                                        color: '#fff',
+                                        minWidth: 24,
+                                        textAlign: 'center'
+                                    }}>S</kbd>
+                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>아래로</span>
+                                </div>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 8,
+                                    padding: '8px 12px',
+                                    background: '#1a1d35',
+                                    borderRadius: 6,
+                                    border: '1px solid #2a2d45'
+                                }}>
+                                    <kbd style={{
+                                        display: 'inline-block',
+                                        padding: '4px 8px',
+                                        background: '#2a2d45',
+                                        border: '1px solid #3a3d55',
+                                        borderRadius: 4,
+                                        fontSize: 14,
+                                        fontWeight: 600,
+                                        color: '#fff',
+                                        minWidth: 24,
+                                        textAlign: 'center'
+                                    }}>D</kbd>
+                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>오른쪽</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 액션 조작 */}
+                        <div>
+                            <div style={{
+                                fontSize: 13,
+                                color: '#9a9aaa',
+                                marginBottom: 8,
+                                fontWeight: 500,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            }}>
+                                액션
+                            </div>
+                            <div style={{ display: 'grid', gap: 6 }}>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 8,
+                                    padding: '8px 12px',
+                                    background: '#1a1d35',
+                                    borderRadius: 6,
+                                    border: '1px solid #2a2d45'
+                                }}>
+                                    <div style={{ display: 'flex', gap: 4 }}>
+                                        <kbd style={{
+                                            display: 'inline-block',
+                                            padding: '4px 8px',
+                                            background: '#2a2d45',
+                                            border: '1px solid #3a3d55',
+                                            borderRadius: 4,
+                                            fontSize: 14,
+                                            fontWeight: 600,
+                                            color: '#fff',
+                                            minWidth: 24,
+                                            textAlign: 'center'
+                                        }}>Z</kbd>
+                                        <span style={{ color: '#666', fontSize: 12, alignSelf: 'center' }}>/</span>
+                                        <kbd style={{
+                                            display: 'inline-block',
+                                            padding: '4px 8px',
+                                            background: '#2a2d45',
+                                            border: '1px solid #3a3d55',
+                                            borderRadius: 4,
+                                            fontSize: 14,
+                                            fontWeight: 600,
+                                            color: '#fff',
+                                            minWidth: 24,
+                                            textAlign: 'center'
+                                        }}>U</kbd>
+                                    </div>
+                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>탄환 발사</span>
+                                </div>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 8,
+                                    padding: '8px 12px',
+                                    background: '#1a1d35',
+                                    borderRadius: 6,
+                                    border: '1px solid #2a2d45'
+                                }}>
+                                    <div style={{ display: 'flex', gap: 4 }}>
+                                        <kbd style={{
+                                            display: 'inline-block',
+                                            padding: '4px 8px',
+                                            background: '#2a2d45',
+                                            border: '1px solid #3a3d55',
+                                            borderRadius: 4,
+                                            fontSize: 14,
+                                            fontWeight: 600,
+                                            color: '#fff',
+                                            minWidth: 24,
+                                            textAlign: 'center'
+                                        }}>X</kbd>
+                                        <span style={{ color: '#666', fontSize: 12, alignSelf: 'center' }}>/</span>
+                                        <kbd style={{
+                                            display: 'inline-block',
+                                            padding: '4px 8px',
+                                            background: '#2a2d45',
+                                            border: '1px solid #3a3d55',
+                                            borderRadius: 4,
+                                            fontSize: 14,
+                                            fontWeight: 600,
+                                            color: '#fff',
+                                            minWidth: 24,
+                                            textAlign: 'center'
+                                        }}>I</kbd>
+                                    </div>
+                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>일시정지</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 팁 */}
+                        <div style={{
+                            marginTop: 8,
+                            padding: 12,
+                            background: '#1a1d35',
+                            borderRadius: 6,
+                            border: '1px solid #5a62f1'
+                        }}>
+                            <div style={{ fontSize: 13, color: '#9a9aaa', marginBottom: 4 }}>💡 Tip</div>
+                            <div style={{ fontSize: 12, color: '#b0b0c0', lineHeight: 1.6 }}>
+                                게임 화면을 클릭하여 포커스를 맞춘 후 키보드 조작이 가능합니다.
+                            </div>
+                        </div>
+
+                        {/* 출처 */}
+                        <div style={{
+                            marginTop: 8,
+                            padding: 12,
+                            background: '#1a1d35',
+                            borderRadius: 6,
+                            border: '1px solid #2a2d45'
+                        }}>
+                            <div style={{ fontSize: 13, color: '#9a9aaa', marginBottom: 6 }}>📦 출처</div>
+                            <a
+                                href="https://github.com/helpcomputer/vortexion"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    fontSize: 11,
+                                    color: '#6b73ff',
+                                    lineHeight: 1.5,
+                                    textDecoration: 'none',
+                                    wordBreak: 'break-all',
+                                    display: 'block'
+                                }}
+                            >
+                                github.com/helpcomputer/vortexion
+                            </a>
+                            <div style={{
+                                fontSize: 11,
+                                color: '#7a7a8a',
+                                marginTop: 6,
+                                fontStyle: 'italic'
+                            }}>
+                                Original game by badcomputer
+                            </div>
+                        </div>
                     </div>
-                )}
+                </div>
             </div>
 
             {showSubmit && gameData && (
