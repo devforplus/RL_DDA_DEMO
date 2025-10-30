@@ -7,6 +7,8 @@ import {
     type GameStatistics,
     type GamePlayFrame
 } from '../api/scores'
+import { useTheme } from '../contexts/ThemeContext'
+import { darkTheme, lightTheme } from '../theme/colors'
 
 // 게임 데이터 타입 정의 (Pyxel에서 받는 데이터)
 interface GameData {
@@ -25,6 +27,9 @@ declare global {
 }
 
 export default function Play() {
+    const { theme } = useTheme()
+    const colors = theme === 'dark' ? darkTheme : lightTheme
+    
     const params = useParams()
     const modelId = params.modelId as string | undefined
     const [isRunning, setIsRunning] = useState(false)
@@ -138,18 +143,18 @@ export default function Play() {
             alignItems: 'center',
             padding: '40px 20px',
             minHeight: 'calc(100vh - 60px)',
-            background: '#0a0a0a'
+            background: colors.background
         }}>
-            <h2 style={{ marginBottom: 32, color: '#fff' }}>🎮 플레이</h2>
-
+            <h2 style={{ marginBottom: 32, color: colors.text }}>🎮 플레이</h2>
+ 
             <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', width: '100%', maxWidth: 1200, justifyContent: 'center' }}>
                 {/* 메인 게임 영역 */}
-                <div style={{ position: 'relative', width: 768, height: 576, background: '#111', borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+                <div style={{ position: 'relative', width: 768, height: 576, background: colors.cardBg, borderRadius: 12, overflow: 'hidden', boxShadow: `0 8px 32px ${colors.shadowStrong}` }}>
                     {!isRunning && (
                         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <button
                                 onClick={() => setIsRunning(true)}
-                                style={{ padding: '14px 18px', borderRadius: 8, border: 'none', background: '#5a62f1', color: '#fff', fontSize: 18 }}
+                                style={{ padding: '14px 18px', borderRadius: 8, border: 'none', background: colors.primary, color: '#fff', fontSize: 18, cursor: 'pointer' }}
                             >
                                 ▶ Run game
                             </button>
@@ -178,14 +183,14 @@ export default function Play() {
                 <div style={{
                     width: 280,
                     padding: 24,
-                    background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+                    background: colors.sidebarBg,
                     borderRadius: 12,
-                    border: '1px solid #2a2a3e',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.3)'
+                    border: `1px solid ${colors.sidebarBorder}`,
+                    boxShadow: `0 4px 16px ${colors.shadow}`
                 }}>
                     <h3 style={{
                         margin: '0 0 20px 0',
-                        color: '#6b73ff',
+                        color: colors.primary,
                         fontSize: 20,
                         fontWeight: 600,
                         display: 'flex',
@@ -200,7 +205,7 @@ export default function Play() {
                         <div>
                             <div style={{
                                 fontSize: 13,
-                                color: '#9a9aaa',
+                                color: colors.textTertiary,
                                 marginBottom: 8,
                                 fontWeight: 500,
                                 textTransform: 'uppercase',
@@ -214,92 +219,92 @@ export default function Play() {
                                     alignItems: 'center',
                                     gap: 8,
                                     padding: '8px 12px',
-                                    background: '#1a1d35',
+                                    background: colors.sidebarSection,
                                     borderRadius: 6,
-                                    border: '1px solid #2a2d45'
+                                    border: `1px solid ${colors.sidebarSectionBorder}`
                                 }}>
                                     <kbd style={{
                                         display: 'inline-block',
                                         padding: '4px 8px',
-                                        background: '#2a2d45',
-                                        border: '1px solid #3a3d55',
+                                        background: colors.kbdBg,
+                                        border: `1px solid ${colors.kbdBorder}`,
                                         borderRadius: 4,
                                         fontSize: 14,
                                         fontWeight: 600,
-                                        color: '#fff',
+                                        color: colors.kbdText,
                                         minWidth: 24,
                                         textAlign: 'center'
                                     }}>W</kbd>
-                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>위로</span>
+                                    <span style={{ color: colors.textSecondary, fontSize: 14 }}>위로</span>
                                 </div>
                                 <div style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: 8,
                                     padding: '8px 12px',
-                                    background: '#1a1d35',
+                                    background: colors.sidebarSection,
                                     borderRadius: 6,
-                                    border: '1px solid #2a2d45'
+                                    border: `1px solid ${colors.sidebarSectionBorder}`
                                 }}>
                                     <kbd style={{
                                         display: 'inline-block',
                                         padding: '4px 8px',
-                                        background: '#2a2d45',
-                                        border: '1px solid #3a3d55',
+                                        background: colors.kbdBg,
+                                        border: `1px solid ${colors.kbdBorder}`,
                                         borderRadius: 4,
                                         fontSize: 14,
                                         fontWeight: 600,
-                                        color: '#fff',
+                                        color: colors.kbdText,
                                         minWidth: 24,
                                         textAlign: 'center'
                                     }}>A</kbd>
-                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>왼쪽</span>
+                                    <span style={{ color: colors.textSecondary, fontSize: 14 }}>왼쪽</span>
                                 </div>
                                 <div style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: 8,
                                     padding: '8px 12px',
-                                    background: '#1a1d35',
+                                    background: colors.sidebarSection,
                                     borderRadius: 6,
-                                    border: '1px solid #2a2d45'
+                                    border: `1px solid ${colors.sidebarSectionBorder}`
                                 }}>
                                     <kbd style={{
                                         display: 'inline-block',
                                         padding: '4px 8px',
-                                        background: '#2a2d45',
-                                        border: '1px solid #3a3d55',
+                                        background: colors.kbdBg,
+                                        border: `1px solid ${colors.kbdBorder}`,
                                         borderRadius: 4,
                                         fontSize: 14,
                                         fontWeight: 600,
-                                        color: '#fff',
+                                        color: colors.kbdText,
                                         minWidth: 24,
                                         textAlign: 'center'
                                     }}>S</kbd>
-                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>아래로</span>
+                                    <span style={{ color: colors.textSecondary, fontSize: 14 }}>아래로</span>
                                 </div>
                                 <div style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: 8,
                                     padding: '8px 12px',
-                                    background: '#1a1d35',
+                                    background: colors.sidebarSection,
                                     borderRadius: 6,
-                                    border: '1px solid #2a2d45'
+                                    border: `1px solid ${colors.sidebarSectionBorder}`
                                 }}>
                                     <kbd style={{
                                         display: 'inline-block',
                                         padding: '4px 8px',
-                                        background: '#2a2d45',
-                                        border: '1px solid #3a3d55',
+                                        background: colors.kbdBg,
+                                        border: `1px solid ${colors.kbdBorder}`,
                                         borderRadius: 4,
                                         fontSize: 14,
                                         fontWeight: 600,
-                                        color: '#fff',
+                                        color: colors.kbdText,
                                         minWidth: 24,
                                         textAlign: 'center'
                                     }}>D</kbd>
-                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>오른쪽</span>
+                                    <span style={{ color: colors.textSecondary, fontSize: 14 }}>오른쪽</span>
                                 </div>
                             </div>
                         </div>
@@ -308,7 +313,7 @@ export default function Play() {
                         <div>
                             <div style={{
                                 fontSize: 13,
-                                color: '#9a9aaa',
+                                color: colors.textTertiary,
                                 marginBottom: 8,
                                 fontWeight: 500,
                                 textTransform: 'uppercase',
@@ -322,76 +327,76 @@ export default function Play() {
                                     alignItems: 'center',
                                     gap: 8,
                                     padding: '8px 12px',
-                                    background: '#1a1d35',
+                                    background: colors.sidebarSection,
                                     borderRadius: 6,
-                                    border: '1px solid #2a2d45'
+                                    border: `1px solid ${colors.sidebarSectionBorder}`
                                 }}>
                                     <div style={{ display: 'flex', gap: 4 }}>
                                         <kbd style={{
                                             display: 'inline-block',
                                             padding: '4px 8px',
-                                            background: '#2a2d45',
-                                            border: '1px solid #3a3d55',
+                                            background: colors.kbdBg,
+                                            border: `1px solid ${colors.kbdBorder}`,
                                             borderRadius: 4,
                                             fontSize: 14,
                                             fontWeight: 600,
-                                            color: '#fff',
+                                            color: colors.kbdText,
                                             minWidth: 24,
                                             textAlign: 'center'
                                         }}>Z</kbd>
-                                        <span style={{ color: '#666', fontSize: 12, alignSelf: 'center' }}>/</span>
+                                        <span style={{ color: colors.textTertiary, fontSize: 12, alignSelf: 'center' }}>/</span>
                                         <kbd style={{
                                             display: 'inline-block',
                                             padding: '4px 8px',
-                                            background: '#2a2d45',
-                                            border: '1px solid #3a3d55',
+                                            background: colors.kbdBg,
+                                            border: `1px solid ${colors.kbdBorder}`,
                                             borderRadius: 4,
                                             fontSize: 14,
                                             fontWeight: 600,
-                                            color: '#fff',
+                                            color: colors.kbdText,
                                             minWidth: 24,
                                             textAlign: 'center'
                                         }}>U</kbd>
                                     </div>
-                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>탄환 발사</span>
+                                    <span style={{ color: colors.textSecondary, fontSize: 14 }}>탄환 발사</span>
                                 </div>
                                 <div style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: 8,
                                     padding: '8px 12px',
-                                    background: '#1a1d35',
+                                    background: colors.sidebarSection,
                                     borderRadius: 6,
-                                    border: '1px solid #2a2d45'
+                                    border: `1px solid ${colors.sidebarSectionBorder}`
                                 }}>
                                     <div style={{ display: 'flex', gap: 4 }}>
                                         <kbd style={{
                                             display: 'inline-block',
                                             padding: '4px 8px',
-                                            background: '#2a2d45',
-                                            border: '1px solid #3a3d55',
+                                            background: colors.kbdBg,
+                                            border: `1px solid ${colors.kbdBorder}`,
                                             borderRadius: 4,
                                             fontSize: 14,
                                             fontWeight: 600,
-                                            color: '#fff',
+                                            color: colors.kbdText,
                                             minWidth: 24,
                                             textAlign: 'center'
                                         }}>X</kbd>
-                                        <span style={{ color: '#666', fontSize: 12, alignSelf: 'center' }}>/</span>
+                                        <span style={{ color: colors.textTertiary, fontSize: 12, alignSelf: 'center' }}>/</span>
                                         <kbd style={{
                                             display: 'inline-block',
                                             padding: '4px 8px',
-                                            background: '#2a2d45',
-                                            border: '1px solid #3a3d55',
+                                            background: colors.kbdBg,
+                                            border: `1px solid ${colors.kbdBorder}`,
                                             borderRadius: 4,
                                             fontSize: 14,
                                             fontWeight: 600,
-                                            color: '#fff',
+                                            color: colors.kbdText,
                                             minWidth: 24,
                                             textAlign: 'center'
                                         }}>I</kbd>
                                     </div>
-                                    <span style={{ color: '#e0e0e0', fontSize: 14 }}>일시정지</span>
+                                    <span style={{ color: colors.textSecondary, fontSize: 14 }}>일시정지</span>
                                 </div>
                             </div>
                         </div>
@@ -400,12 +405,12 @@ export default function Play() {
                         <div style={{
                             marginTop: 8,
                             padding: 12,
-                            background: '#1a1d35',
+                            background: colors.sidebarSection,
                             borderRadius: 6,
-                            border: '1px solid #5a62f1'
+                            border: `1px solid ${colors.primary}`
                         }}>
-                            <div style={{ fontSize: 13, color: '#9a9aaa', marginBottom: 4 }}>💡 Tip</div>
-                            <div style={{ fontSize: 12, color: '#b0b0c0', lineHeight: 1.6 }}>
+                            <div style={{ fontSize: 13, color: colors.textTertiary, marginBottom: 4 }}>💡 Tip</div>
+                            <div style={{ fontSize: 12, color: colors.textTertiary, lineHeight: 1.6 }}>
                                 게임 화면을 클릭하여 포커스를 맞춘 후 키보드 조작이 가능합니다.
                             </div>
                         </div>
@@ -414,18 +419,18 @@ export default function Play() {
                         <div style={{
                             marginTop: 8,
                             padding: 12,
-                            background: '#1a1d35',
+                            background: colors.sidebarSection,
                             borderRadius: 6,
-                            border: '1px solid #2a2d45'
+                            border: `1px solid ${colors.sidebarSectionBorder}`
                         }}>
-                            <div style={{ fontSize: 13, color: '#9a9aaa', marginBottom: 6 }}>📦 출처</div>
-                            <a
+                            <div style={{ fontSize: 13, color: colors.textTertiary, marginBottom: 6 }}>📦 출처</div>
+                            <a 
                                 href="https://github.com/helpcomputer/vortexion"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                style={{
-                                    fontSize: 11,
-                                    color: '#6b73ff',
+                                style={{ 
+                                    fontSize: 11, 
+                                    color: colors.primary, 
                                     lineHeight: 1.5,
                                     textDecoration: 'none',
                                     wordBreak: 'break-all',
@@ -434,9 +439,9 @@ export default function Play() {
                             >
                                 github.com/helpcomputer/vortexion
                             </a>
-                            <div style={{
-                                fontSize: 11,
-                                color: '#7a7a8a',
+                            <div style={{ 
+                                fontSize: 11, 
+                                color: colors.textTertiary, 
                                 marginTop: 6,
                                 fontStyle: 'italic'
                             }}>
@@ -455,33 +460,33 @@ export default function Play() {
                     maxWidth: 768,
                     marginTop: 32,
                     padding: 32,
-                    background: '#1a1a2e',
+                    background: colors.backgroundSecondary,
                     borderRadius: 16,
-                    border: '2px solid #5a62f1',
-                    boxShadow: '0 8px 32px rgba(90, 98, 241, 0.4)'
+                    border: `2px solid ${colors.primary}`,
+                    boxShadow: `0 8px 32px ${colors.shadow}`
                 }}>
-                    <h3 style={{ margin: 0, color: '#5a62f1', fontSize: 24, textAlign: 'center' }}>🎮 게임 종료!</h3>
+                    <h3 style={{ margin: 0, color: colors.primary, fontSize: 24, textAlign: 'center' }}>🎮 게임 종료!</h3>
 
                     <div style={{ display: 'grid', gap: 10, fontSize: 15 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e0e0e0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: colors.textSecondary }}>
                             <span>최종 점수:</span>
-                            <strong style={{ color: '#6b73ff', fontSize: 18 }}>{gameData.score}</strong>
+                            <strong style={{ color: colors.primary, fontSize: 18 }}>{gameData.score}</strong>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e0e0e0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: colors.textSecondary }}>
                             <span>도달 스테이지:</span>
-                            <strong style={{ color: '#ffffff' }}>{gameData.final_stage}</strong>
+                            <strong style={{ color: colors.text }}>{gameData.final_stage}</strong>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e0e0e0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: colors.textSecondary }}>
                             <span>플레이 시간:</span>
-                            <strong style={{ color: '#ffffff' }}>{gameData.statistics.play_duration.toFixed(1)}초</strong>
+                            <strong style={{ color: colors.text }}>{gameData.statistics.play_duration.toFixed(1)}초</strong>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e0e0e0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: colors.textSecondary }}>
                             <span>적 처치:</span>
-                            <strong style={{ color: '#ffffff' }}>{gameData.statistics.enemies_destroyed}</strong>
+                            <strong style={{ color: colors.text }}>{gameData.statistics.enemies_destroyed}</strong>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#e0e0e0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', color: colors.textSecondary }}>
                             <span>명중률:</span>
-                            <strong style={{ color: '#ffffff' }}>
+                            <strong style={{ color: colors.text }}>
                                 {gameData.statistics.shots_fired > 0
                                     ? ((gameData.statistics.hits / gameData.statistics.shots_fired) * 100).toFixed(1)
                                     : '0'}%
@@ -489,8 +494,8 @@ export default function Play() {
                         </div>
                     </div>
 
-                    <div style={{ borderTop: '1px solid #4a4d65', paddingTop: 16 }}>
-                        <label style={{ display: 'block', marginBottom: 8, fontWeight: 500, color: '#e0e0e0', fontSize: 15 }}>
+                    <div style={{ borderTop: `1px solid ${colors.cardBorder}`, paddingTop: 16 }}>
+                        <label style={{ display: 'block', marginBottom: 8, fontWeight: 500, color: colors.textSecondary, fontSize: 15 }}>
                             닉네임을 입력하여 점수를 등록하세요:
                         </label>
                         <input
@@ -504,9 +509,9 @@ export default function Play() {
                                 padding: '12px 16px',
                                 fontSize: 16,
                                 borderRadius: 8,
-                                border: '2px solid #4a4d65',
-                                background: '#1a1d35',
-                                color: '#ffffff',
+                                border: `2px solid ${colors.inputBorder}`,
+                                background: colors.inputBg,
+                                color: colors.inputText,
                                 boxSizing: 'border-box'
                             }}
                             autoFocus
@@ -520,13 +525,13 @@ export default function Play() {
                             padding: '14px 24px',
                             borderRadius: 8,
                             border: 'none',
-                            background: submitting || !nickname.trim() ? '#5a5a6a' : '#6b73ff',
+                            background: submitting || !nickname.trim() ? colors.textTertiary : colors.primary,
                             color: '#ffffff',
                             fontSize: 16,
                             fontWeight: 600,
                             cursor: submitting || !nickname.trim() ? 'not-allowed' : 'pointer',
                             transition: 'background 0.2s',
-                            boxShadow: submitting || !nickname.trim() ? 'none' : '0 2px 10px rgba(107, 115, 255, 0.4)'
+                            boxShadow: submitting || !nickname.trim() ? 'none' : `0 2px 10px ${colors.shadow}`
                         }}
                     >
                         {submitting ? '등록 중...' : '점수 등록'}
@@ -536,16 +541,16 @@ export default function Play() {
                         <div style={{
                             padding: 12,
                             borderRadius: 8,
-                            background: submitMessage.includes('✅') ? '#2d5a2d' : '#5a2d2d',
+                            background: submitMessage.includes('✅') ? colors.successBg : colors.errorBg,
                             textAlign: 'center',
                             fontWeight: 500,
-                            color: '#ffffff'
+                            color: colors.text
                         }}>
                             {submitMessage}
                         </div>
                     )}
 
-                    <div style={{ fontSize: 13, color: '#b0b0c0', marginTop: 8 }}>
+                    <div style={{ fontSize: 13, color: colors.textTertiary, marginTop: 8 }}>
                         💡 등록하면 게임 플레이 데이터가 데이터베이스에 저장되고 리더보드에 표시됩니다.
                     </div>
                 </div>
