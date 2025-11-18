@@ -1,40 +1,29 @@
 """
 레거시 리플레이 JSON을 새 형식으로 변환하는 스크립트
 
-구버전: metadata + frames
-신버전: metadata + score + final_stage + statistics + frames + enemy_events
+구버전: metadata + frames (action 필드만)
+신버전: metadata + score + final_stage + statistics + frames (input 필드 추가) + enemy_events
 """
 import json
 import sys
 from pathlib import Path
 from typing import Dict, List, Any
 
-# 게임 상수
-VIEW_WIDTH = 256
-SCROLL_X_SPEED = 0.5
-MAP_HEIGHT_TILES = 20
-
-# 적 스폰 타일 X 좌표 (src/enemy_spawn.py에서 가져옴)
-ENEMY_SPAWN_TILE_X = {
-    0: "EnemyA",
-    16: "EnemyB", 
-    32: "EnemyC",
-    48: "EnemyD",
-    64: "EnemyE",
-    80: "EnemyF",
-    96: "EnemyG",
-    112: "EnemyH",
-    128: "EnemyI",
-    144: "EnemyJ",
-    208: "EnemyN",
-    224: "EnemyO",
-    240: "EnemyP",
-}
-
-ENEMY_BOSS_SPAWN_TILE_X = {
-    160: "EnemyK",
-    176: "EnemyL",
-    192: "EnemyM",
+# RL 액션을 키 입력으로 매핑
+# Discrete Action Space (10가지):
+# 0: UP, 1: DOWN, 2: LEFT, 3: RIGHT, 4: NOOP,
+# 5: UP+SHOOT, 6: DOWN+SHOOT, 7: LEFT+SHOOT, 8: RIGHT+SHOOT, 9: SHOOT
+ACTION_TO_INPUTS = {
+    0: {'input_up': 1, 'input_down': 0, 'input_left': 0, 'input_right': 0, 'input_button1': 0, 'input_button2': 0},  # UP
+    1: {'input_up': 0, 'input_down': 1, 'input_left': 0, 'input_right': 0, 'input_button1': 0, 'input_button2': 0},  # DOWN
+    2: {'input_up': 0, 'input_down': 0, 'input_left': 1, 'input_right': 0, 'input_button1': 0, 'input_button2': 0},  # LEFT
+    3: {'input_up': 0, 'input_down': 0, 'input_left': 0, 'input_right': 1, 'input_button1': 0, 'input_button2': 0},  # RIGHT
+    4: {'input_up': 0, 'input_down': 0, 'input_left': 0, 'input_right': 0, 'input_button1': 0, 'input_button2': 0},  # NOOP
+    5: {'input_up': 1, 'input_down': 0, 'input_left': 0, 'input_right': 0, 'input_button1': 1, 'input_button2': 0},  # UP+SHOOT
+    6: {'input_up': 0, 'input_down': 1, 'input_left': 0, 'input_right': 0, 'input_button1': 1, 'input_button2': 0},  # DOWN+SHOOT
+    7: {'input_up': 0, 'input_down': 0, 'input_left': 1, 'input_right': 0, 'input_button1': 1, 'input_button2': 0},  # LEFT+SHOOT
+    8: {'input_up': 0, 'input_down': 0, 'input_left': 0, 'input_right': 1, 'input_button1': 1, 'input_button2': 0},  # RIGHT+SHOOT
+    9: {'input_up': 0, 'input_down': 0, 'input_left': 0, 'input_right': 0, 'input_button1': 1, 'input_button2': 0},  # SHOOT
 }
 
 
@@ -130,6 +119,11 @@ def simulate_enemy_spawns(total_frames: int) -> List[Dict[str, Any]]:
     return enemy_events
 
 
+def convert_action_to_inputs(action: int) -> Dict[str, int]:
+    """RL action을 input 필드로 변환"""
+    return ACTION_TO_INPUTS.get(action, ACTION_TO_INPUTS[4])  # 기본값은 NOOP
+
+
 def convert_replay(input_path: Path) -> Dict[str, Any]:
     """레거시 리플레이 JSON을 새 형식으로 변환합니다."""
     print(f"변환 중: {input_path}")
@@ -140,23 +134,47 @@ def convert_replay(input_path: Path) -> Dict[str, Any]:
     
     # 기존 데이터 추출
     metadata = data.get("metadata", {})
-    frames = data.get("frames", [])
-    total_frames = len(frames)
+    old_frames = data.get("frames", [])
+    total_frames = len(old_frames)
     
-    # 적 스폰 이벤트 생성
-    print(f"  - 총 {total_frames} 프레임에 대한 적 스폰 이벤트 생성 중...")
-    enemy_events = simulate_enemy_spawns(total_frames)
-    print(f"  - {len(enemy_events)}개의 적 스폰 이벤트 생성됨")
+    # frames 데이터 변환: action을 input 필드로 변환
+    print(f"  - 총 {total_frames} 프레임 변환 중...")
+    new_frames = []
+    for i, frame in enumerate(old_frames):
+        action = frame.get("action", 4)  # 기본값 NOOP
+        inputs = convert_action_to_inputs(action)
+        
+        # 새 프레임 데이터 생성
+        new_frame = {
+            "frame_number": i,
+            "player_x": float(frame.get("player", {}).get("x", 0)),
+            "player_y": float(frame.get("player", {}).get("y", 0)),
+            "player_lives": frame.get("player", {}).get("lives", 1),
+            "player_score": frame.get("score", 0),
+            "current_weapon": 0,  # 기본 무기
+            **inputs,  # input 필드 추가
+            "stage_num": 1,
+            "timestamp": float(i) / 30.0,  # 30 FPS 기준
+        }
+        new_frames.append(new_frame)
+    
+    print(f"  - {len(new_frames)}개의 프레임 변환 완료")
+    
+    # 적 스폰 이벤트는 실제 게임 데이터를 사용해야 하므로 임시로 빈 배열
+    # 실제로는 게임을 한 번 플레이해서 enemy_events를 얻어야 함
+    print(f"  - 경고: enemy_events는 실제 게임 플레이 데이터가 필요합니다")
+    print(f"  - 임시로 빈 배열을 사용합니다")
+    enemy_events = []
     
     # 최종 점수 계산 (마지막 프레임의 점수)
-    final_score = frames[-1]["score"] if frames else 0
+    final_score = old_frames[-1].get("score", 0) if old_frames else 0
     
     # 통계 생성
     play_duration = total_frames / 30.0  # 30 FPS 가정
     statistics = {
         "total_frames": total_frames,
         "play_duration": play_duration,
-        "enemies_destroyed": len(enemy_events),  # 추정값
+        "enemies_destroyed": 0,  # 실제 데이터 필요
         "shots_fired": 0,  # 알 수 없음
         "hits": 0,  # 알 수 없음
         "deaths": 0,  # 알 수 없음
@@ -168,7 +186,7 @@ def convert_replay(input_path: Path) -> Dict[str, Any]:
         "score": final_score,
         "final_stage": 1,  # Stage 1 가정
         "statistics": statistics,
-        "frames": frames,
+        "frames": new_frames,
         "enemy_events": enemy_events,
     }
     
