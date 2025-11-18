@@ -57,6 +57,22 @@ export type GameStatistics = {
 }
 
 /**
+ * 적 이벤트 (생성 또는 공격)
+ */
+export type EnemyEvent = {
+    event_type: 'enemy_spawn' | 'enemy_shoot'
+    frame: number
+    enemy_id: number
+    enemy_type?: string  // spawn 시에만
+    x: number
+    y: number
+    scroll_x?: number    // spawn 시에만
+    vx?: number          // shoot 시에만
+    vy?: number          // shoot 시에만
+    delay?: number       // shoot 시에만
+}
+
+/**
  * 게임 플레이 데이터 제출 요청
  * 백엔드 API 스펙: POST /api/gameplay
  */
@@ -67,6 +83,7 @@ export type GamePlaySubmitRequest = {
     model_id?: string
     statistics: GameStatistics
     frames: GamePlayFrame[]
+    enemy_events: EnemyEvent[]
 }
 
 /**

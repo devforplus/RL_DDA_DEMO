@@ -5,8 +5,8 @@ SPEED = 1
 BULLET_SPEED = 2
 
 class EnemyE(Enemy):
-    def __init__(self, state, x, y) -> None:
-        super().__init__(state, x, y)
+    def __init__(self, state, x, y, enemy_id: int = -1) -> None:
+        super().__init__(state, x, y, enemy_id)
         self.colour = 10 # yellow
         self.u = 64
         self.v = 80

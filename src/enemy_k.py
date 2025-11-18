@@ -8,8 +8,8 @@ MOVE_SPEED_Y = 0.5
 
 
 class EnemyK(Enemy):
-    def __init__(self, state, x, y) -> None:
-        super().__init__(state, x, y)
+    def __init__(self, state, x, y, enemy_id: int = -1) -> None:
+        super().__init__(state, x, y, enemy_id)
         self.colour = 11  # yellow
         self.u = 160
         self.v = 80

@@ -41,10 +41,29 @@ ENEMY_BOSS_SPAWN_TILE_X = {
 ENEMY_SPAWN_TILE_INDEX_Y = 10
 
 def create(state, tile_x, x, y):
+    # 적 ID 생성
+    enemy_id = -1
+    if hasattr(state, 'game') and hasattr(state.game, 'data_collector'):
+        enemy_id = state.game.data_collector.get_next_enemy_id()
+    
     if tile_x in ENEMY_BOSS_SPAWN_TILE_X:
         f = ENEMY_BOSS_SPAWN_TILE_X[tile_x]
-        state.add_boss(f(state, x, y))
+        boss = f(state, x, y, enemy_id)
+        state.add_boss(boss)
+        
+        # 보스 생성 이벤트 기록
+        if enemy_id >= 0:
+            state.game.data_collector.record_enemy_spawn(
+                enemy_id, boss.__class__.__name__, x, y, state.background.scroll_x
+            )
     elif tile_x in ENEMY_SPAWN_TILE_X:
         f = ENEMY_SPAWN_TILE_X[tile_x]
-        state.add_enemy(f(state, x, y))
+        enemy = f(state, x, y, enemy_id)
+        state.add_enemy(enemy)
+        
+        # 적 생성 이벤트 기록
+        if enemy_id >= 0:
+            state.game.data_collector.record_enemy_spawn(
+                enemy_id, enemy.__class__.__name__, x, y, state.background.scroll_x
+            )
     

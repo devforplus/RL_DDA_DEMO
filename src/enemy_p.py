@@ -7,8 +7,8 @@ BULLET_SPEED = 4
 SHOT_DELAY = 120
 
 class EnemyP(Enemy):
-    def __init__(self, state, x, y) -> None:
-        super().__init__(state, x, y)
+    def __init__(self, state, x, y, enemy_id: int = -1) -> None:
+        super().__init__(state, x, y, enemy_id)
         self.colour = 9 # pink
         self.u = 240
         self.v = 80

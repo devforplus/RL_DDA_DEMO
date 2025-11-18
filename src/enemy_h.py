@@ -6,8 +6,8 @@ GRAVITY = 0.2
 
 
 class EnemyH(Enemy):
-    def __init__(self, state, x, y) -> None:
-        super().__init__(state, x, y)
+    def __init__(self, state, x, y, enemy_id: int = -1) -> None:
+        super().__init__(state, x, y, enemy_id)
         self.colour = 6  # red
         self.u = 112
         self.v = 80

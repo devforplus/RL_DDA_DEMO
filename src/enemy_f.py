@@ -4,8 +4,8 @@ from enemy import Enemy
 BULLET_SPEED = 2
 
 class EnemyF(Enemy):
-    def __init__(self, state, x, y) -> None:
-        super().__init__(state, x, y)
+    def __init__(self, state, x, y, enemy_id: int = -1) -> None:
+        super().__init__(state, x, y, enemy_id)
         self.colour = 2 # green
         self.u = 80
         self.v = 80

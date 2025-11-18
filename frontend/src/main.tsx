@@ -21,6 +21,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="play" element={<Play />} />
             <Route path="play/:modelId" element={<Play />} />
             <Route path="watch/:modelId" element={<Watch />} />
+            <Route path="replay" element={<Replay />} />
             <Route path="replay/:replayId" element={<Replay />} />
             <Route path="models" element={<Models />} />
             <Route path="rank" element={<Rank />} />

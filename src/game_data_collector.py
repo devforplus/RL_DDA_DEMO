@@ -19,6 +19,10 @@ class GameDataCollector:
         self.hits = 0
         self.deaths = 0
         
+        # 적 패턴 데이터
+        self.enemy_events: List[Dict[str, Any]] = []
+        self.enemy_id_counter = 0
+        
     def start_recording(self, start_time: float):
         """녹화 시작"""
         self.is_recording = True
@@ -29,6 +33,8 @@ class GameDataCollector:
         self.shots_fired = 0
         self.hits = 0
         self.deaths = 0
+        self.enemy_events = []
+        self.enemy_id_counter = 0
         
     def stop_recording(self, end_time: float):
         """녹화 종료"""
@@ -58,6 +64,45 @@ class GameDataCollector:
     def add_death(self):
         """사망 카운트 증가"""
         self.deaths += 1
+    
+    def get_next_enemy_id(self) -> int:
+        """새로운 적 ID 생성"""
+        enemy_id = self.enemy_id_counter
+        self.enemy_id_counter += 1
+        return enemy_id
+    
+    def record_enemy_spawn(self, enemy_id: int, enemy_type: str, x: float, y: float, scroll_x: float):
+        """적 생성 이벤트 기록"""
+        if not self.is_recording:
+            return
+            
+        event = {
+            "event_type": "enemy_spawn",
+            "frame": self.total_frames,
+            "enemy_id": enemy_id,
+            "enemy_type": enemy_type,
+            "x": float(x),
+            "y": float(y),
+            "scroll_x": float(scroll_x),
+        }
+        self.enemy_events.append(event)
+    
+    def record_enemy_shoot(self, enemy_id: int, x: float, y: float, vx: float, vy: float, delay: int = 0):
+        """적 공격 이벤트 기록"""
+        if not self.is_recording:
+            return
+            
+        event = {
+            "event_type": "enemy_shoot",
+            "frame": self.total_frames,
+            "enemy_id": enemy_id,
+            "x": float(x),
+            "y": float(y),
+            "vx": float(vx),
+            "vy": float(vy),
+            "delay": delay,
+        }
+        self.enemy_events.append(event)
         
     def get_play_duration(self) -> float:
         """플레이 시간(초) 반환"""
@@ -81,6 +126,7 @@ class GameDataCollector:
             "final_stage": final_stage,
             "statistics": self.get_statistics(),
             "frames": self.frames_data,
+            "enemy_events": self.enemy_events,
         }
         
     def export_json(self, score: int, final_stage: int) -> str:
@@ -97,4 +143,6 @@ class GameDataCollector:
         self.hits = 0
         self.deaths = 0
         self.is_recording = False
+        self.enemy_events = []
+        self.enemy_id_counter = 0
 

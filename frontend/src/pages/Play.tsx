@@ -5,7 +5,8 @@ import MjpegViewer from '../components/MjpegViewer'
 import {
     submitGamePlayData,
     type GameStatistics,
-    type GamePlayFrame
+    type GamePlayFrame,
+    type EnemyEvent
 } from '../api/scores'
 import { useTheme } from '../contexts/ThemeContext'
 import { darkTheme, lightTheme } from '../theme/colors'
@@ -16,6 +17,7 @@ interface GameData {
     final_stage: number
     statistics: GameStatistics
     frames: GamePlayFrame[]
+    enemy_events: EnemyEvent[]
 }
 
 // window 객체 타입 확장
@@ -29,7 +31,7 @@ declare global {
 export default function Play() {
     const { theme } = useTheme()
     const colors = theme === 'dark' ? darkTheme : lightTheme
-    
+
     const params = useParams()
     const modelId = params.modelId as string | undefined
     const [isRunning, setIsRunning] = useState(false)
@@ -73,9 +75,10 @@ export default function Play() {
                     // 타임스탬프 업데이트 (중복 처리 방지)
                     lastTimestamp = timestamp
 
-                    // localStorage 클리어
-                    localStorage.removeItem('pyxelGameCompleted')
-                    localStorage.removeItem('pyxelGameData')
+                    // localStorage 클리어 (디버깅을 위해 주석 처리)
+                    // TODO: 나중에 다시 활성화
+                    // localStorage.removeItem('pyxelGameCompleted')
+                    // localStorage.removeItem('pyxelGameData')
                 }
             } catch (error) {
                 console.error('Failed to check game completion:', error)
@@ -112,6 +115,7 @@ export default function Play() {
                 model_id: modelId,
                 statistics: gameData.statistics,
                 frames: gameData.frames,
+                enemy_events: gameData.enemy_events,
             })
 
             if ('ok' in result && result.ok) {
@@ -146,7 +150,7 @@ export default function Play() {
             background: colors.background
         }}>
             <h2 style={{ marginBottom: 32, color: colors.text }}>🎮 플레이</h2>
- 
+
             <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', width: '100%', maxWidth: 1200, justifyContent: 'center' }}>
                 {/* 메인 게임 영역 */}
                 <div style={{ position: 'relative', width: 768, height: 576, background: colors.cardBg, borderRadius: 12, overflow: 'hidden', boxShadow: `0 8px 32px ${colors.shadowStrong}` }}>
@@ -424,13 +428,13 @@ export default function Play() {
                             border: `1px solid ${colors.sidebarSectionBorder}`
                         }}>
                             <div style={{ fontSize: 13, color: colors.textTertiary, marginBottom: 6 }}>📦 출처</div>
-                            <a 
+                            <a
                                 href="https://github.com/helpcomputer/vortexion"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                style={{ 
-                                    fontSize: 11, 
-                                    color: colors.primary, 
+                                style={{
+                                    fontSize: 11,
+                                    color: colors.primary,
                                     lineHeight: 1.5,
                                     textDecoration: 'none',
                                     wordBreak: 'break-all',
@@ -439,9 +443,9 @@ export default function Play() {
                             >
                                 github.com/helpcomputer/vortexion
                             </a>
-                            <div style={{ 
-                                fontSize: 11, 
-                                color: colors.textTertiary, 
+                            <div style={{
+                                fontSize: 11,
+                                color: colors.textTertiary,
                                 marginTop: 6,
                                 fontStyle: 'italic'
                             }}>

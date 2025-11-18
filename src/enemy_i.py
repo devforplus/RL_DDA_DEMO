@@ -6,8 +6,8 @@ VEL_Y = [-0.5, 1, -1.25, 1.25, -1, 0.5]
 
 
 class EnemyI(Enemy):
-    def __init__(self, state, x, y) -> None:
-        super().__init__(state, x, y)
+    def __init__(self, state, x, y, enemy_id: int = -1) -> None:
+        super().__init__(state, x, y, enemy_id)
         self.colour = 8  # red
         self.u = 128
         self.v = 80

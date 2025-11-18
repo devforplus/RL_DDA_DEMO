@@ -8,8 +8,8 @@ BULLET_SPEED = 1.5
 
 # Boss: Eye
 class EnemyM(Enemy):
-    def __init__(self, state, x, y) -> None:
-        super().__init__(state, x, y)
+    def __init__(self, state, x, y, enemy_id: int = -1) -> None:
+        super().__init__(state, x, y, enemy_id)
         self.colour = 9  # light red
         self.u = 192
         self.v = 80
