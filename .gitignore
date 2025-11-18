@@ -75,3 +75,10 @@ Thumbs.db
 requirements-dev.lock
 requirements.lock
 pnpm-lock.yaml
+
+# Model replay JSON files #
+############################
+models/*.json
+models/*.backup
+frontend/public/models/*.json
+frontend/public/models/*.backup
