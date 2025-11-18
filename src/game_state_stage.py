@@ -403,7 +403,7 @@ class GameStateStage:
                 js.console.log("=== Game Over - All data saved to localStorage ===")
                 
             except ImportError:
-                # 로컬 실행 환경
+                # 로컬 실행 환경 - 파일로 저장
                 print("Game Over!")
                 print(f"Final Score: {self.game.game_vars.score}")
                 game_data = self.game.data_collector.export_data(
@@ -411,6 +411,37 @@ class GameStateStage:
                     final_stage=self.game.game_vars.stage_num,
                 )
                 print(f"Frames: {len(game_data['frames'])}, Enemy events: {len(game_data['enemy_events'])}")
+                
+                # 파일로 저장 (절대 경로 사용)
+                import os
+                from pathlib import Path
+                
+                # 현재 작업 디렉토리 확인
+                print(f"Current working directory: {os.getcwd()}")
+                
+                # 프로젝트 루트 찾기 (src.pyxapp가 있는 디렉토리)
+                project_root = Path.cwd()
+                if not (project_root / "models").exists():
+                    # models 디렉토리가 없으면 상위로 올라가거나 생성
+                    if (project_root.parent / "models").exists():
+                        project_root = project_root.parent
+                    else:
+                        # 현재 위치에 models 생성
+                        (project_root / "models").mkdir(exist_ok=True)
+                
+                models_dir = project_root / "models"
+                models_dir.mkdir(exist_ok=True)
+                
+                output_file = models_dir / "enemy_pattern_template.json"
+                with open(output_file, 'w', encoding='utf-8') as f:
+                    json.dump(game_data['enemy_events'], f, indent=2, ensure_ascii=False)
+                print(f"✓ Enemy events saved to: {output_file}")
+                
+                # 전체 게임 데이터도 저장
+                full_output = models_dir / "game_data_local.json"
+                with open(full_output, 'w', encoding='utf-8') as f:
+                    json.dump(game_data, f, indent=2, ensure_ascii=False)
+                print(f"✓ Full game data saved to: {full_output}")
 
         except Exception as e:
             try:
