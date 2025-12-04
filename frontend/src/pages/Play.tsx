@@ -96,29 +96,6 @@ export default function Play() {
         }
     }, [isRunning])
 
-    // 게임 데이터 다운로드 핸들러
-    const handleDownload = () => {
-        if (!gameData) return
-
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
-        const filename = `web_game_data_${timestamp}.json`
-        
-        const jsonStr = JSON.stringify(gameData, null, 2)
-        const blob = new Blob([jsonStr], { type: 'application/json' })
-        const url = URL.createObjectURL(blob)
-        
-        const a = document.createElement('a')
-        a.href = url
-        a.download = filename
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-        
-        setSubmitMessage(`✅ ${filename} 다운로드 완료!`)
-        setTimeout(() => setSubmitMessage(''), 3000)
-    }
-
     // 닉네임 제출 핸들러
     const handleSubmit = async () => {
         if (!gameData || !nickname.trim()) {
@@ -554,27 +531,10 @@ export default function Play() {
 
                     <div style={{ display: 'flex', gap: 12 }}>
                         <button
-                            onClick={handleDownload}
-                            style={{
-                                flex: 1,
-                                padding: '14px 24px',
-                                borderRadius: 8,
-                                border: `2px solid ${colors.primary}`,
-                                background: 'transparent',
-                                color: colors.primary,
-                                fontSize: 16,
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                            }}
-                        >
-                            📥 데이터 다운로드
-                        </button>
-                        <button
                             onClick={handleSubmit}
                             disabled={submitting || !nickname.trim()}
                             style={{
-                                flex: 1,
+                                width: '100%',
                                 padding: '14px 24px',
                                 borderRadius: 8,
                                 border: 'none',
@@ -605,9 +565,7 @@ export default function Play() {
                     )}
 
                     <div style={{ fontSize: 13, color: colors.textTertiary, marginTop: 8, lineHeight: 1.6 }}>
-                        💡 <strong>데이터 다운로드:</strong> 게임 플레이 데이터를 JSON 파일로 다운로드할 수 있습니다.<br/>
-                        💡 <strong>점수 등록:</strong> 등록하면 게임 플레이 데이터가 데이터베이스에 저장되고 리더보드에 표시됩니다.<br/>
-                        💡 <strong>비교:</strong> 다운로드한 파일을 <code>python scripts/compare_with_master.py &lt;다운로드한_파일&gt;</code>로 master.json과 비교할 수 있습니다.
+                        💡 <strong>점수 등록:</strong> 닉네임을 입력하고 등록하면 점수가 리더보드에 기록됩니다.
                     </div>
                 </div>
             )}
