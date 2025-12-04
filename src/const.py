@@ -43,7 +43,7 @@ class EntityType(Enum):
 
 
 STARTING_LIVES = 1
-MAX_LIVES = 1
+MAX_LIVES = 5  # RL 환경과 일치
 MAX_WEAPONS = 3
 MAX_WEAPON_LEVEL = 5
 WEAPON_NAMES = ["A", "B", "C"]
