@@ -126,6 +126,13 @@ export default function Play() {
             return
         }
 
+        // 예약된 닉네임 체크
+        const forbiddenNicknames = ['beginner', 'medium', 'master']
+        if (forbiddenNicknames.includes(nickname.trim().toLowerCase())) {
+            setSubmitMessage('사용할 수 없는 닉네임입니다.')
+            return
+        }
+
         setSubmitting(true)
         setSubmitMessage('')
 
