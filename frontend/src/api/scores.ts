@@ -13,6 +13,10 @@ export type Score = {
     score: number
     modelId?: string
     createdAt?: string
+    play_duration?: number
+    statistics?: {
+        play_duration: number
+    }
 }
 
 /**

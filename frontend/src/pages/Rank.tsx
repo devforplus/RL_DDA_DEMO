@@ -202,15 +202,22 @@ export default function Rank() {
                                     padding: '16px 32px',
                                     fontWeight: 600,
                                     color: colors.primary,
-                                    width: '10%'
+                                    width: '20%'
                                 }}>닉네임</th>
                                 <th style={{
                                     textAlign: 'center',
-                                    padding: '16px 100px',
+                                    padding: '16px 40px',
                                     fontWeight: 600,
                                     color: colors.primary,
-                                    width: '30%'
+                                    width: '20%'
                                 }}>점수</th>
+                                <th style={{
+                                    textAlign: 'center',
+                                    padding: '16px 40px',
+                                    fontWeight: 600,
+                                    color: colors.primary,
+                                    width: '20%'
+                                }}>생존 시간</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -252,13 +259,23 @@ export default function Rank() {
                                             {r.nickname}
                                         </td>
                                         <td style={{
-                                            padding: '16px 100px',
+                                            padding: '16px 40px',
                                             textAlign: 'center',
                                             fontWeight: 600,
                                             fontSize: rank <= 3 ? 18 : 16,
                                             color: rank <= 3 ? colors.primary : colors.text
                                         }}>
                                             {r.score.toLocaleString()}
+                                        </td>
+                                        <td style={{
+                                            padding: '16px 40px',
+                                            textAlign: 'center',
+                                            fontWeight: 400,
+                                            fontSize: 16,
+                                            color: colors.text
+                                        }}>
+                                            {r.play_duration ? `${r.play_duration.toFixed(1)}초` : 
+                                             r.statistics?.play_duration ? `${r.statistics.play_duration.toFixed(1)}초` : '-'}
                                         </td>
                                     </tr>
                                 )
