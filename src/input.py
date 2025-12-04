@@ -7,6 +7,7 @@ LEFT = 2
 RIGHT = 3
 BUTTON_1 = 4
 BUTTON_2 = 5
+BUTTON_INVINCIBLE = 6
 
 class Input:
     def __init__(self):
@@ -65,7 +66,11 @@ class Input:
             px.btnp(px.GAMEPAD1_BUTTON_A):
             self.tapped.append(BUTTON_1)
         
-        if px.btnp(px.KEY_X) or px.btnp(px.KEY_I) or \
+        if px.btnp(px.KEY_X) or \
             px.btnp(px.GAMEPAD1_BUTTON_B):
             self.tapped.append(BUTTON_2)
+        
+        # i 키는 무적 모드 토글용으로 별도 처리
+        if px.btnp(px.KEY_I):
+            self.tapped.append(BUTTON_INVINCIBLE)
             

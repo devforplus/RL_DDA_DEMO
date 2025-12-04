@@ -36,15 +36,6 @@ class GameStateComplete:
 
     def _export_game_data(self):
         """게임 데이터를 JavaScript로 전달"""
-        # 리플레이 모드에서는 데이터를 저장하지 않음
-        if self.game.is_replay_mode:
-            try:
-                import js
-                js.console.log("=== Replay mode: Skipping data export ===")
-            except:
-                pass
-            return
-            
         try:
             # JavaScript로 데이터 전달 (Pyxel 웹 환경)
             try:
@@ -78,47 +69,38 @@ class GameStateComplete:
                 js.console.log("=== Game completed - All data saved to localStorage ===")
                 
             except ImportError:
-                # 로컬 실행 환경 - 파일로 저장
-                print("Game Completed!")
+                # 로컬 실행 환경에서는 파일로 저장
+                import os
+                from datetime import datetime
                 
-                # 데이터 수집
+                print("Game completed!")
                 game_data = self.game.data_collector.export_data(
                     score=self.game.game_vars.score,
                     final_stage=self.game.game_vars.stage_num,
                 )
-                print(f"Final Score: {game_data['score']}, Stage: {game_data['final_stage']}")
+                print(f"Score: {self.game.game_vars.score}")
+                print(f"Statistics: {game_data['statistics']}")
                 print(f"Frames: {len(game_data['frames'])}, Enemy events: {len(game_data['enemy_events'])}")
                 
-                # 파일로 저장 (절대 경로 사용)
-                import os
-                from pathlib import Path
+                # models 디렉토리 확인 및 생성
+                models_dir = "models"
+                if not os.path.exists(models_dir):
+                    os.makedirs(models_dir)
                 
-                # 현재 작업 디렉토리 확인
-                print(f"Current working directory: {os.getcwd()}")
+                # 타임스탬프 생성
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                 
-                # 프로젝트 루트 찾기 (src.pyxapp가 있는 디렉토리)
-                project_root = Path.cwd()
-                if not (project_root / "models").exists():
-                    # models 디렉토리가 없으면 상위로 올라가거나 생성
-                    if (project_root.parent / "models").exists():
-                        project_root = project_root.parent
-                    else:
-                        # 현재 위치에 models 생성
-                        (project_root / "models").mkdir(exist_ok=True)
-                
-                models_dir = project_root / "models"
-                models_dir.mkdir(exist_ok=True)
-                
-                output_file = models_dir / "enemy_pattern_template.json"
-                with open(output_file, 'w', encoding='utf-8') as f:
-                    json.dump(game_data['enemy_events'], f, indent=2, ensure_ascii=False)
-                print(f"✓ Enemy events saved to: {output_file}")
-                
-                # 전체 게임 데이터도 저장
-                full_output = models_dir / "game_data_local.json"
-                with open(full_output, 'w', encoding='utf-8') as f:
+                # 전체 게임 데이터 저장
+                full_data_filename = os.path.join(models_dir, f"game_data_{timestamp}.json")
+                with open(full_data_filename, 'w', encoding='utf-8') as f:
                     json.dump(game_data, f, indent=2, ensure_ascii=False)
-                print(f"✓ Full game data saved to: {full_output}")
+                print(f"✓ 전체 게임 데이터 저장: {full_data_filename}")
+                
+                # 적 이벤트만 저장 (enemy_pattern_template.json 형식)
+                enemy_events_filename = os.path.join(models_dir, f"enemy_pattern_{timestamp}.json")
+                with open(enemy_events_filename, 'w', encoding='utf-8') as f:
+                    json.dump(game_data['enemy_events'], f, indent=2, ensure_ascii=False)
+                print(f"✓ 적 이벤트 데이터 저장: {enemy_events_filename}")
 
         except Exception as e:
             try:

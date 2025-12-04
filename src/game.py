@@ -7,8 +7,6 @@ from game_state_stage import GameStateStage
 from game_state_complete import GameStateComplete
 from game_vars import GameVars
 from game_data_collector import GameDataCollector
-from replay_manager import ReplayManager
-from replay_input import ReplayInput
 
 
 class GameState(Enum):
@@ -24,9 +22,6 @@ class Game:
         self.next_state = None
         self.game_vars = GameVars(self)
         self.data_collector = GameDataCollector()
-        self.replay_manager = ReplayManager()
-        self.replay_input: Optional[ReplayInput] = None
-        self.is_replay_mode = False
 
         self.state = GameStateTitles(self)
         # self.state = GameStateStage(self)
@@ -39,46 +34,8 @@ class Game:
         self.game_vars.new_game()
         self.data_collector.clear()
         self.data_collector.start_recording(time.time())
-        self.is_replay_mode = False
-        self.replay_input = None
         self.next_state = GameState.STAGE
     
-    def go_to_replay(self, replay_json: str):
-        """리플레이 모드로 게임 시작"""
-        try:
-            import js
-            js.console.log("=== Loading replay data ===")
-        except:
-            pass
-            
-        if not self.replay_manager.load_from_json(replay_json):
-            try:
-                import js
-                js.console.error("Failed to load replay data")
-            except:
-                pass
-            print("Failed to load replay data")
-            return False
-        
-        try:
-            import js
-            js.console.log(f"Replay data loaded: {len(self.replay_manager.frames_data)} frames, {len(self.replay_manager.enemy_events)} enemy events")
-        except:
-            pass
-        
-        self.game_vars.new_game()
-        self.is_replay_mode = True
-        self.replay_input = ReplayInput(self.replay_manager.frames_data)
-        self.next_state = GameState.STAGE
-        
-        try:
-            import js
-            js.console.log("=== Replay mode activated ===")
-        except:
-            pass
-            
-        return True
-
     def go_to_continue(self):
         self.game_vars.continue_game()
         self.data_collector.start_recording(time.time())
