@@ -7,19 +7,25 @@ const MODELS = [
     { 
         id: 'beginner', 
         name: '초급 (Beginner)', 
-        skillLevel: 0.05,
+        skillLevel: 0.1,
+        steps: 441,
+        score: 400,
         videoSrc: '/models/replay_ep2_steps_400_20251203_031340.mp4'
     },
     { 
         id: 'medium', 
         name: '중급 (Medium)', 
         skillLevel: 0.5,
+        steps: 1018,
+        score: 1200,
         videoSrc: '/models/replay_ep174_steps_1000_20251203_041458.mp4'
     },
     { 
         id: 'master', 
         name: '고급 (Master)', 
-        skillLevel: 0.95,
+        skillLevel: 1.0,
+        steps: 1353,
+        score: 1400,
         videoSrc: '/models/replay_ep1087_steps_1400_20251203_085256.mp4'
     },
 ]
@@ -83,10 +89,48 @@ export default function Replay() {
                 >
                     {MODELS.map(model => (
                         <option key={model.id} value={model.id}>
-                            {model.name} (Skill: {model.skillLevel}) 📹
+                            {model.name}
                         </option>
                     ))}
                 </select>
+
+                <div style={{ 
+                    marginTop: 20, 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(3, 1fr)', 
+                    gap: 12 
+                }}>
+                    <div style={{ 
+                        padding: 12, 
+                        background: colors.background, 
+                        borderRadius: 8, 
+                        border: `1px solid ${colors.inputBorder}`,
+                        textAlign: 'center'
+                    }}>
+                        <div style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 4 }}>Score</div>
+                        <div style={{ fontSize: 20, fontWeight: 700, color: colors.primary }}>{currentModel.score}</div>
+                    </div>
+                    <div style={{ 
+                        padding: 12, 
+                        background: colors.background, 
+                        borderRadius: 8, 
+                        border: `1px solid ${colors.inputBorder}`,
+                        textAlign: 'center'
+                    }}>
+                        <div style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 4 }}>Steps</div>
+                        <div style={{ fontSize: 20, fontWeight: 700, color: colors.text }}>{currentModel.steps}</div>
+                    </div>
+                    <div style={{ 
+                        padding: 12, 
+                        background: colors.background, 
+                        borderRadius: 8, 
+                        border: `1px solid ${colors.inputBorder}`,
+                        textAlign: 'center'
+                    }}>
+                        <div style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 4 }}>Skill</div>
+                        <div style={{ fontSize: 20, fontWeight: 700, color: colors.text }}>{currentModel.skillLevel}</div>
+                    </div>
+                </div>
             </div>
 
             {/* 비디오 플레이어 */}
