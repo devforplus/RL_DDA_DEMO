@@ -77,8 +77,8 @@ export default function Play() {
 
                     // localStorage 클리어 (디버깅을 위해 주석 처리)
                     // TODO: 나중에 다시 활성화
-                    // localStorage.removeItem('pyxelGameCompleted')
-                    // localStorage.removeItem('pyxelGameData')
+                    localStorage.removeItem('pyxelGameCompleted')
+                    localStorage.removeItem('pyxelGameData')
                 }
             } catch (error) {
                 console.error('Failed to check game completion:', error)
@@ -95,6 +95,29 @@ export default function Play() {
             clearInterval(interval)
         }
     }, [isRunning])
+
+    // 게임 데이터 다운로드 핸들러
+    const handleDownload = () => {
+        if (!gameData) return
+
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
+        const filename = `web_game_data_${timestamp}.json`
+        
+        const jsonStr = JSON.stringify(gameData, null, 2)
+        const blob = new Blob([jsonStr], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        
+        setSubmitMessage(`✅ ${filename} 다운로드 완료!`)
+        setTimeout(() => setSubmitMessage(''), 3000)
+    }
 
     // 닉네임 제출 핸들러
     const handleSubmit = async () => {
@@ -522,24 +545,44 @@ export default function Play() {
                         />
                     </div>
 
-                    <button
-                        onClick={handleSubmit}
-                        disabled={submitting || !nickname.trim()}
-                        style={{
-                            padding: '14px 24px',
-                            borderRadius: 8,
-                            border: 'none',
-                            background: submitting || !nickname.trim() ? colors.textTertiary : colors.primary,
-                            color: '#ffffff',
-                            fontSize: 16,
-                            fontWeight: 600,
-                            cursor: submitting || !nickname.trim() ? 'not-allowed' : 'pointer',
-                            transition: 'background 0.2s',
-                            boxShadow: submitting || !nickname.trim() ? 'none' : `0 2px 10px ${colors.shadow}`
-                        }}
-                    >
-                        {submitting ? '등록 중...' : '점수 등록'}
-                    </button>
+                    <div style={{ display: 'flex', gap: 12 }}>
+                        <button
+                            onClick={handleDownload}
+                            style={{
+                                flex: 1,
+                                padding: '14px 24px',
+                                borderRadius: 8,
+                                border: `2px solid ${colors.primary}`,
+                                background: 'transparent',
+                                color: colors.primary,
+                                fontSize: 16,
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                            }}
+                        >
+                            📥 데이터 다운로드
+                        </button>
+                        <button
+                            onClick={handleSubmit}
+                            disabled={submitting || !nickname.trim()}
+                            style={{
+                                flex: 1,
+                                padding: '14px 24px',
+                                borderRadius: 8,
+                                border: 'none',
+                                background: submitting || !nickname.trim() ? colors.textTertiary : colors.primary,
+                                color: '#ffffff',
+                                fontSize: 16,
+                                fontWeight: 600,
+                                cursor: submitting || !nickname.trim() ? 'not-allowed' : 'pointer',
+                                transition: 'background 0.2s',
+                                boxShadow: submitting || !nickname.trim() ? 'none' : `0 2px 10px ${colors.shadow}`
+                            }}
+                        >
+                            {submitting ? '등록 중...' : '점수 등록'}
+                        </button>
+                    </div>
 
                     {submitMessage && (
                         <div style={{
@@ -554,8 +597,10 @@ export default function Play() {
                         </div>
                     )}
 
-                    <div style={{ fontSize: 13, color: colors.textTertiary, marginTop: 8 }}>
-                        💡 등록하면 게임 플레이 데이터가 데이터베이스에 저장되고 리더보드에 표시됩니다.
+                    <div style={{ fontSize: 13, color: colors.textTertiary, marginTop: 8, lineHeight: 1.6 }}>
+                        💡 <strong>데이터 다운로드:</strong> 게임 플레이 데이터를 JSON 파일로 다운로드할 수 있습니다.<br/>
+                        💡 <strong>점수 등록:</strong> 등록하면 게임 플레이 데이터가 데이터베이스에 저장되고 리더보드에 표시됩니다.<br/>
+                        💡 <strong>비교:</strong> 다운로드한 파일을 <code>python scripts/compare_with_master.py &lt;다운로드한_파일&gt;</code>로 master.json과 비교할 수 있습니다.
                     </div>
                 </div>
             )}

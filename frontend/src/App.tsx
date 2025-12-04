@@ -27,7 +27,6 @@ function App() {
         }}>
           <Link to="/play" style={{ padding: '6px 10px', color: colors.navText, textDecoration: 'none' }}>Play</Link>
           <Link to="/replay" style={{ padding: '6px 10px', color: colors.navText, textDecoration: 'none' }}>Replay</Link>
-          <Link to="/models" style={{ padding: '6px 10px', color: colors.navText, textDecoration: 'none' }}>Models</Link>
           <Link to="/rank" style={{ padding: '6px 10px', color: colors.navText, textDecoration: 'none' }}>Rank</Link>
         </nav>
         <button

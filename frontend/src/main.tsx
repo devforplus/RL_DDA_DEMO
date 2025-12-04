@@ -5,7 +5,6 @@ import './index.css'
 import App from './App.tsx'
 import Home from './pages/Home.tsx'
 import Play from './pages/Play.tsx'
-import Models from './pages/Models.tsx'
 import Rank from './pages/Rank.tsx'
 import Watch from './pages/Watch.tsx'
 import Replay from './pages/Replay.tsx'
@@ -23,7 +22,6 @@ createRoot(document.getElementById('root')!).render(
             <Route path="watch/:modelId" element={<Watch />} />
             <Route path="replay" element={<Replay />} />
             <Route path="replay/:replayId" element={<Replay />} />
-            <Route path="models" element={<Models />} />
             <Route path="rank" element={<Rank />} />
           </Route>
         </Routes>
