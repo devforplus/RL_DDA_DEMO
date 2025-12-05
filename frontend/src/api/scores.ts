@@ -16,6 +16,7 @@ export type Score = {
     play_duration?: number
     statistics?: {
         play_duration: number
+        total_frames: number
     }
 }
 
