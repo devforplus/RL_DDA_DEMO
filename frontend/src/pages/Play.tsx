@@ -565,7 +565,8 @@ export default function Play() {
                     )}
 
                     <div style={{ fontSize: 13, color: colors.textTertiary, marginTop: 8, lineHeight: 1.6 }}>
-                        💡 <strong>점수 등록:</strong> 닉네임을 입력하고 등록하면 점수가 리더보드에 기록됩니다.
+                        <div>💡 <strong>점수 등록:</strong> 닉네임을 입력하고 등록하면 점수가 리더보드에 기록됩니다.</div>
+                        <div style={{ marginTop: 4 }}>⚠️ <strong>주의:</strong> 'Beginner', 'Medium', 'Master'는 예약된 닉네임으로 사용할 수 없습니다.</div>
                     </div>
                 </div>
             )}
