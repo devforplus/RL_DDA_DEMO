@@ -10,8 +10,8 @@ export default function Rank() {
     const [rows, setRows] = useState<Score[] | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
-    const [modelFilter, setModelFilter] = useState<string>('')
-    const [pageSize, setPageSize] = useState(100)
+    const [modelFilter, setModelFilter] = useState<string>('beginner')
+    const [pageSize, setPageSize] = useState(10)
 
     const loadLeaderboard = async () => {
         setLoading(true)
@@ -89,7 +89,6 @@ export default function Rank() {
                             cursor: loading ? 'not-allowed' : 'pointer',
                         }}
                     >
-                        <option value="">전체 모델</option>
                         <option value="beginner">Beginner</option>
                         <option value="medium">Medium</option>
                         <option value="master">Master</option>
@@ -111,9 +110,7 @@ export default function Rank() {
                         }}
                     >
                         <option value="10">10개</option>
-                        <option value="25">25개</option>
-                        <option value="50">50개</option>
-                        <option value="100">100개</option>
+                        <option value="20">20개</option>
                     </select>
 
                     {/* 새로고침 버튼 */}
@@ -217,7 +214,7 @@ export default function Rank() {
                                     fontWeight: 600,
                                     color: colors.primary,
                                     width: '20%'
-                                }}>생존 시간</th>
+                                }}>생존 프레임</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -274,8 +271,7 @@ export default function Rank() {
                                             fontSize: 16,
                                             color: colors.text
                                         }}>
-                                            {r.play_duration ? `${r.play_duration.toFixed(1)}초` : 
-                                             r.statistics?.play_duration ? `${r.statistics.play_duration.toFixed(1)}초` : '-'}
+                                            {r.statistics?.total_frames ? `${r.statistics.total_frames.toLocaleString()}` : '-'}
                                         </td>
                                     </tr>
                                 )
