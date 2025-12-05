@@ -14,6 +14,7 @@ export type Score = {
     modelId?: string
     createdAt?: string
     play_duration?: number
+    total_frames?: number
     statistics?: {
         play_duration: number
         total_frames: number

@@ -181,13 +181,6 @@ export default function Rank() {
                                 }}>닉네임</th>
                                 <th style={{
                                     textAlign: 'center',
-                                    padding: '16px 24px',
-                                    fontWeight: 600,
-                                    color: colors.primary,
-                                    width: '15%'
-                                }}>모델</th>
-                                <th style={{
-                                    textAlign: 'center',
                                     padding: '16px 40px',
                                     fontWeight: 600,
                                     color: colors.primary,
@@ -199,7 +192,7 @@ export default function Rank() {
                                     fontWeight: 600,
                                     color: colors.primary,
                                     width: '20%'
-                                }}>생존 프레임</th>
+                                }}>생존 시간</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -241,15 +234,6 @@ export default function Rank() {
                                             {r.nickname}
                                         </td>
                                         <td style={{
-                                            padding: '16px 24px',
-                                            textAlign: 'center',
-                                            fontWeight: 400,
-                                            fontSize: 16,
-                                            color: colors.textSecondary
-                                        }}>
-                                            {r.modelId || '-'}
-                                        </td>
-                                        <td style={{
                                             padding: '16px 40px',
                                             textAlign: 'center',
                                             fontWeight: 600,
@@ -265,7 +249,8 @@ export default function Rank() {
                                             fontSize: 16,
                                             color: colors.text
                                         }}>
-                                            {r.statistics?.total_frames ? `${r.statistics.total_frames.toLocaleString()}` : '-'}
+                                            {r.play_duration ? `${r.play_duration.toFixed(2)}초` : 
+                                             r.statistics?.play_duration ? `${r.statistics.play_duration.toFixed(2)}초` : '-'}
                                         </td>
                                     </tr>
                                 )
