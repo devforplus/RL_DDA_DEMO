@@ -10,18 +10,16 @@ export default function Rank() {
     const [rows, setRows] = useState<Score[] | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
-    const [modelFilter, setModelFilter] = useState<string>('beginner')
     const [pageSize, setPageSize] = useState(10)
 
     const loadLeaderboard = async () => {
         setLoading(true)
         setError(null)
         try {
-            console.log('랭킹 데이터 요청 중...', { pageSize, modelFilter })
+            console.log('랭킹 데이터 요청 중...', { pageSize })
             const data = await fetchRankings({
                 page: 1,
                 page_size: pageSize,
-                model_id: modelFilter || undefined,
             })
             console.log('받은 데이터:', data)
             console.log('데이터 타입:', typeof data, Array.isArray(data))
@@ -45,7 +43,7 @@ export default function Rank() {
 
     useEffect(() => {
         loadLeaderboard()
-    }, [modelFilter, pageSize])
+    }, [pageSize])
 
     const getRankColor = (rank: number) => {
         if (rank === 1) return '#FFD700' // 금
@@ -74,26 +72,6 @@ export default function Rank() {
                 <h2 style={{ margin: 0, color: colors.text }}>🏆 리더보드</h2>
 
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    {/* 모델 필터 */}
-                    <select
-                        value={modelFilter}
-                        onChange={(e) => setModelFilter(e.target.value)}
-                        disabled={loading}
-                        style={{
-                            padding: '8px 12px',
-                            borderRadius: 8,
-                            border: `1px solid ${colors.cardBorder}`,
-                            background: colors.inputBg,
-                            color: colors.text,
-                            fontSize: 14,
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                        }}
-                    >
-                        <option value="beginner">Beginner</option>
-                        <option value="medium">Medium</option>
-                        <option value="master">Master</option>
-                    </select>
-
                     {/* 페이지 크기 */}
                     <select
                         value={pageSize}
@@ -203,6 +181,13 @@ export default function Rank() {
                                 }}>닉네임</th>
                                 <th style={{
                                     textAlign: 'center',
+                                    padding: '16px 24px',
+                                    fontWeight: 600,
+                                    color: colors.primary,
+                                    width: '15%'
+                                }}>모델</th>
+                                <th style={{
+                                    textAlign: 'center',
                                     padding: '16px 40px',
                                     fontWeight: 600,
                                     color: colors.primary,
@@ -254,6 +239,15 @@ export default function Rank() {
                                             color: colors.text
                                         }}>
                                             {r.nickname}
+                                        </td>
+                                        <td style={{
+                                            padding: '16px 24px',
+                                            textAlign: 'center',
+                                            fontWeight: 400,
+                                            fontSize: 16,
+                                            color: colors.textSecondary
+                                        }}>
+                                            {r.modelId || '-'}
                                         </td>
                                         <td style={{
                                             padding: '16px 40px',
